@@ -314,6 +314,43 @@ void str_to_array(char *string, long_real_t *number)
 }
 
 /**
+ * Функция, копирующая массив целых чисел в поле mantissa структуры
+ * типа long_real_t и, в случае необходимости, округляет этот массив
+ * @array_src - исходный массив целых чисел
+ * @size_src - длина исходного массива целых чисел
+ * @number - структура типа long_real_t
+ */
+void array_copy(int *array_src, int size_src, long_real_t *number)
+{
+    if (size_src >= MANTISSA_LEN)
+    {
+        number->mantissa_size = MANTISSA_LEN - 1;
+        number->power += (size_src - number->mantissa_size);
+
+        if (array_src[MANTISSA_LEN - 1] >= 5)
+            array_src[MANTISSA_LEN - 2]++;
+
+        for (int i = MANTISSA_LEN - 2; i > 0; i--)
+            if (array_src[i] > 9)
+            {
+                array_src[i - 1] += array_src[i] / 10;
+                array_src[i] %= 10;
+            }
+
+        if (array_src[0] > 9)
+        {
+            array_src[0] /= 10;
+            number->power++;
+        }
+    }
+    else
+        number->mantissa_size = size_src;
+
+    for (size_t i = 0; i < number->mantissa_size; i++)
+        number->mantissa[i] = array_src[i];
+}
+
+/**
  * Наиболее важная функция, реализующая умножение действительных чисел и, если
  * нужно, их округление
  * @params - три структуры типа long_real_t
@@ -325,96 +362,74 @@ long_real_t *l_real_res)
     l_real_2->mantissa_sign;
     l_real_res->power += l_real_1->power + l_real_2->power;
 
+    int tmp_buffer[2 * MANTISSA_LEN + 1] = {0};
+    int tmp_size = 0;
+
     int mod = 0, k = 0, begin = 0, number = 0;
-    unsigned char flag = 0;
 
     for (int i = l_real_2->mantissa_size - 1; i >= 0; i--)
     {
         for (int j = l_real_1->mantissa_size - 1; j >= 0; j--)
         {
             number = l_real_1->mantissa[j] * l_real_2->mantissa[i] + mod;
-            l_real_res->mantissa[k] += number % 10;
+            tmp_buffer[k] += number % 10;
             mod = number / 10;
             k++;
         }
 
         if (mod != 0)
-            l_real_res->mantissa[k] += mod;
-
-        
+            tmp_buffer[k] += mod;
 
         for (size_t i = 0; i < k - 1; i++)
-            if (l_real_res->mantissa[i] > 9)
+            if (tmp_buffer[i] > 9)
             {
-                l_real_res->mantissa[i + 1] += l_real_res->mantissa[i] / 10;
-                l_real_res->mantissa[i] %= 10;
+                tmp_buffer[i + 1] += tmp_buffer[i] / 10;
+                tmp_buffer[i] %= 10;
             }
 
         if (i == 0)
             break;
-
-        if (k > MANTISSA_LEN)
-        {
-            flag = 1;
-
-            if (l_real_res->mantissa[0] >= 5)
-                l_real_res->mantissa[1]++;
-
-            for (size_t i = 0; i < MANTISSA_LEN - 1; i++)
-                if (l_real_res->mantissa[i] > 9)
-                {
-                    l_real_res->mantissa[i + 1] += l_real_res->mantissa[i] / 10;
-                    l_real_res->mantissa[i] %= 10;
-                }
-
-            for (size_t i = 0; i < MANTISSA_LEN - 1; i++)
-                l_real_res->mantissa[i] = l_real_res->mantissa[i + 1];
-
-            l_real_res->mantissa[MANTISSA_LEN - 1] = 0;
-        }
-
-        if (!flag)
-        {
-            k = begin + 1;
-            begin++;
-        }
-        else
-            k = begin;
-
+        
+        k = begin + 1;
         mod = 0;
+        begin++;
     }
 
-    if (flag)
-    {
-        l_real_res->mantissa_size = 1;
-
-        if (l_real_res->mantissa[MANTISSA_LEN + 1] >= 5)
-            l_real_res->mantissa[0]++;
-        else
-            l_real_res->mantissa[0] = 0;
-
-        l_real_res->power += l_real_1->mantissa_size + l_real_2->mantissa_size;
-
-        return;
-    }
-    else if (mod != 0 && k <= MANTISSA_LEN)
-        l_real_res->mantissa_size = k + 1;
+    if (mod != 0)
+        tmp_size = k + 1;
     else
-        l_real_res->mantissa_size = k;
+        tmp_size = k;
 
-    for (size_t i = 0; i < l_real_res->mantissa_size - 1; i++)
-        if (l_real_res->mantissa[i] > 9)
+    for (size_t i = 0; i < tmp_size - 1; i++)
+        if (tmp_buffer[i] > 9)
         {
-            l_real_res->mantissa[i + 1] += l_real_res->mantissa[i] / 10;
-            l_real_res->mantissa[i] %= 10;
+            tmp_buffer[i + 1] += tmp_buffer[i] / 10;
+            tmp_buffer[i] %= 10;
         }
 
-    for (size_t i = 0; i < l_real_res->mantissa_size / 2; i++)
+    if (tmp_buffer[tmp_size - 1] > 9)
+        tmp_buffer[tmp_size - 1] /= 10;
+
+    for (size_t i = 0; i < tmp_size / 2; i++)
     {
-        int tmp = l_real_res->mantissa[i];
-        l_real_res->mantissa[i] = 
-        l_real_res->mantissa[l_real_res->mantissa_size - i - 1];
-        l_real_res->mantissa[l_real_res->mantissa_size - i - 1] = tmp;
+        int tmp_element = tmp_buffer[i];
+        tmp_buffer[i] = tmp_buffer[tmp_size - i - 1];
+        tmp_buffer[tmp_size - i - 1] = tmp_element;
+    }
+
+    array_copy(tmp_buffer, tmp_size, l_real_res);
+}
+
+/**
+ * Функция, убирающая ненужные нули в мантиссе
+ * @number - структура типа long_real_t
+ */
+void simplify_mantissa(long_real_t *number)
+{
+    for (int i = number->mantissa_size - 1; number->mantissa[i] == 0; i--)
+    {
+        number->mantissa_size--;
+        number->power++;
     }
 }
 
@@ -435,9 +450,6 @@ int print_result(long_real_t *number)
         printf("-0.");
     else
         printf("+0.");
-
-    if (number->mantissa_size > MANTISSA_LEN - 1)
-        number->mantissa_size = MANTISSA_LEN - 2;
 
     for (size_t i = 0; i < number->mantissa_size; i++)
         printf("%d", number->mantissa[i]);

@@ -22,7 +22,7 @@
 typedef struct
 {
     unsigned char mantissa_sign;
-    int mantissa[MANTISSA_LEN + 2];
+    int mantissa[MANTISSA_LEN];
     unsigned int mantissa_size;
     int power;
 } long_real_t;
@@ -36,8 +36,10 @@ void get_mantissa_sign(char *string, long_real_t *number);
 void simplify_number(char *string, long_real_t *number);
 int char_to_int(char symbol);
 void str_to_array(char *string, long_real_t *number);
+void array_copy(int *array_src, int size_src, long_real_t *number);
 void multiply_numbers(long_real_t *l_real_1, long_real_t *l_real_2,
 long_real_t *l_real_res);
+void simplify_mantissa(long_real_t *number);
 int print_result(long_real_t *number);
 
 #endif

@@ -111,7 +111,7 @@ int main(void)
 
     if (is_zero(str_number_1) || is_zero(str_number_2))
     {
-        printf("Результат умножения:                  0.0");
+        printf("Результат умножения:                 +0.0e+0");
         return EXIT_SUCCESS;
     }
 
@@ -126,6 +126,7 @@ int main(void)
     str_to_array(str_number_2, &number_2); // целых чисел
 
     multiply_numbers(&number_1, &number_2, &number_res); // Умножение
+    simplify_mantissa(&number_res);
 
     if (print_result(&number_res) == POWER_OVERFLOW) // Вывод результата
     {
