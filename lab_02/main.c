@@ -14,36 +14,58 @@ int main(int argc, char **argv)
     if (input_file == NULL)
         return EXIT_FAILURE;
 
-    country_t country_array[10] = { 0 };
-    size_t size = -1;
+    country_t initial_table[MAX_TABLE_SIZE] = { 0 };
+    key_t key_table[MAX_TABLE_SIZE] = { 0 };
+    size_t table_size = 0;
 
-    while (!feof(input_file))
+    if (read_all_data(input_file, initial_table, key_table, &table_size))
     {
-        size++;
-        scanf_country(input_file, &country_array[size]);   
+        fclose(input_file);
+
+        return EXIT_FAILURE;
     }
 
     fclose(input_file);
-    print_info();
-
+    print_instruction();
+    
     int choice = 0;
 
-    while (1)
+    while (choice < 9)
     {
         print_menu();
         scanf("%d", &choice);
 
-        switch (choice)
+        if (choice == 1)
         {
-        case 1:
-            print_all_data(stdout, country_array, size);
-            break;
-        case 2:
-            find_by_sport(stdout, country_array, size);
-            break;
-        case 0:
-            return EXIT_SUCCESS;
+            printf("\n");
+            print_all_data(stdout, initial_table, table_size);
         }
+        else if (choice == 2)
+        {
+            printf("\n");
+            find_by_sport(stdout, initial_table, table_size);
+        }
+        else if (choice == 3)
+        {
+            table_bubble_sort(initial_table, table_size);
+            printf("\n");
+            print_all_data(stdout, initial_table, table_size);
+        }
+        else if (choice == 4)
+        {
+            key_bubble_sort(key_table, table_size);
+            printf("\n");
+            print_by_keys(stdout, initial_table, key_table, table_size);
+        }
+        else if (choice == 5)
+        {
+            print_info();
+
+            if (insert_array(&initial_table[table_size], &table_size))
+                printf("Ошибка: введены некорректные данные.\n");
+        }
+        else
+            return EXIT_SUCCESS;
     }
 
     return EXIT_SUCCESS;
