@@ -13,4 +13,4 @@ sort.o : sort.c sort.h
 	gcc $(CFLAGS) sort.c -c
 
 clean :
-	rm *.o
+	rm *.o *.exe

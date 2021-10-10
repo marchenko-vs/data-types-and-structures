@@ -33,18 +33,19 @@ int compare(long long *population_1, long long *population_2)
 
 void table_bubble_sort(country_t *array, const int size)
 {
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
+    struct timeval tv_start, tv_end;
+    int64_t overall_time;
+    gettimeofday(&tv_start, NULL);
     
     for (size_t i = 0; i < size - 1; i++)    
         for (size_t j = 0; j < size - i - 1; j++)
             if (compare(&array[j].population, &array[j + 1].population) > 0)
                 table_swap(&array[j], &array[j + 1]);
 
-    gettimeofday(&tv2, NULL);
-    int64_t ans;
-    ans = (tv2.tv_usec - tv1.tv_usec) / 1000000 + (long double) (tv2.tv_sec - tv1.tv_sec);
-    printf ("Bubble sort time: %" PRId64 " ms\n", ans);
+    gettimeofday(&tv_end, NULL);
+    overall_time = (tv_end.tv_sec - tv_start.tv_sec) * 1000000LL + 
+    (tv_end.tv_usec - tv_start.tv_usec);
+    printf("Bubble sort time: %" PRId64 " ms\n", overall_time);
 }
 
 void key_bubble_sort(key_t *array, const int size)
@@ -57,8 +58,9 @@ void key_bubble_sort(key_t *array, const int size)
 
 void table_shell_sort(country_t *array, const int size)
 {
-    struct timeval tv1, tv2;
-    gettimeofday(&tv1, NULL);
+    struct timeval tv_start, tv_end;
+    int64_t overall_time;
+    gettimeofday(&tv_start, NULL);
     
     int i, j, step;
     country_t tmp;
@@ -75,10 +77,10 @@ void table_shell_sort(country_t *array, const int size)
             }
             array[j] = tmp;
         }
-    gettimeofday(&tv2, NULL);
-    int64_t ans;
-    ans = (tv2.tv_usec - tv1.tv_usec) / 1000000 + (long double) (tv2.tv_sec - tv1.tv_sec);
-    printf ("Shell sort time: %" PRId64 " ms\n", ans);
+    gettimeofday(&tv_end, NULL);
+    overall_time = (tv_end.tv_sec - tv_start.tv_sec) * 1000000LL + 
+    (tv_end.tv_usec - tv_start.tv_usec);
+    printf("Shell sort time: %" PRId64 " ms\n", overall_time);
 }
 
 void copy_array(country_t *array_1, country_t *array_2, const int size)
