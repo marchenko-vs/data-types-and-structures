@@ -75,5 +75,9 @@ int array_remove(country_t *country, size_t *size);
 void printf_country(FILE *stream, country_t *country);
 void print_all_data(FILE *stream, country_t *country, const int size);
 void print_by_keys(FILE *stream, country_t *country, key_t *keys, const int size);
+void copy_array(country_t *array_1, country_t *array_2, const int size);
+void copy_key_array(key_t *array_1, key_t *array_2, const int size);
+void print_keys_table(FILE *stream, key_t *array, const int size);
+void sort_comparison(country_t *table, key_t *key_table, const int size);
 
 #endif

@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <inttypes.h>
+#include "sort.h"
 
 void print_instruction(void)
 {
@@ -15,16 +18,16 @@ void print_menu(void)
 {
     printf("\n                                      Меню\n"
         "1 - Считать данные из файла в таблицу.\n"
-        "2 - Вывести информацию обо всех странах.\n"
-        "3 - Вывести список стран на выбранном материке, где можно заняться "
+        "2 - Вывести список стран на выбранном материке, где можно заняться "
         "указанным\nвидом спорта.\n"
-        "4 - Упорядочить таблицу по возрастанию населения, используя исходную\n"
-        "таблицу.\n5 - Упорядочить таблицу по возрастанию населения, "
-        "используя\nтаблицу ключей.\n6 - Вывести упорядоченную исходную "
-        "таблицу.\n"
-        "7 - Вывести упорядоченную таблицу, используя таблицу ключей.\n"
-        "8 - Добавить элемент в конец таблицы.\n9 - Удалить элемент таблицы"
-        " по названию страны.\n10 - Сравнить время сортировки таблицы двумя " 
+        "3 - Упорядочить таблицу по возрастанию населения, "
+        "используя исходную таблицу.\n4 - Упорядочить таблицу по "
+        "возрастанию населения, "
+        "используя\nтаблицу ключей.\n5 - Вывести исходную таблицу.\n"
+        "6 - Вывести исходную таблицу, используя таблицу ключей.\n"
+        "7 - Вывести таблицу ключей.\n"
+        "8 - Добавить запись в конец таблицы.\n9 - Удалить запись"
+        " по названию страны.\n10 - Сравнить время сортировки таблиц двумя " 
         "алгоритмами.\n"
         "0 - Выйти из программы.\n"
         "\n");
@@ -493,4 +496,85 @@ void print_by_keys(FILE *stream, country_t *country, key_t *keys, const int size
 {
     for (size_t i = 0; i < size; i++)
         printf_country(stream, &country[keys[i].index]);
+}
+
+void copy_array(country_t *array_1, country_t *array_2, const int size)
+{
+    for (size_t i = 0; i < size; i++)
+        array_2[i] = array_1[i];
+}
+
+void copy_key_array(key_t *array_1, key_t *array_2, const int size)
+{
+    for (size_t i = 0; i < size; i++)
+        array_2[i] = array_1[i];
+}
+
+void print_keys_table(FILE *stream, key_t *array, const int size)
+{
+    printf("----------+----------+------------------\n");
+    printf("  Номер   |  Индекс  |      Население     \n");
+    printf("----------+----------+------------------\n");
+    for (size_t i = 0; i < size; i++)
+        printf("%-10lld|%-10lld|%-20lld\n", i, array[i].index, array[i].key);
+    printf("----------+----------+--------------------\n");
+}
+
+void sort_comparison(country_t *table, key_t *key_table, const int size)
+{
+    country_t array_to_sort_1[MAX_TABLE_SIZE] = {0};
+    copy_array(table, array_to_sort_1, size);
+    struct timeval tv_start_bubble, tv_end_bubble;
+    int64_t overall_time_bubble;
+    gettimeofday(&tv_start_bubble, NULL);
+    table_bubble_sort(array_to_sort_1, size);
+    gettimeofday(&tv_end_bubble, NULL);
+    overall_time_bubble =
+    (tv_end_bubble.tv_sec - tv_start_bubble.tv_sec) * 1000000LL + 
+    (tv_end_bubble.tv_usec - tv_start_bubble.tv_usec);
+
+    country_t array_to_sort_2[MAX_TABLE_SIZE] = {0};
+    copy_array(table, array_to_sort_2, size);
+    struct timeval tv_start_shell, tv_end_shell;
+    int64_t overall_time_shell;
+    gettimeofday(&tv_start_shell, NULL);
+    table_shell_sort(array_to_sort_2, size);
+    gettimeofday(&tv_end_shell, NULL);
+    overall_time_shell = (tv_end_shell.tv_sec - tv_start_bubble.tv_sec)
+    * 1000000LL + (tv_end_shell.tv_usec - tv_start_bubble.tv_usec);
+
+    key_t keys_to_sort_1[MAX_TABLE_SIZE] = {0};
+    copy_key_array(key_table, keys_to_sort_1, size);
+    struct timeval tv_start_k_bubble, tv_end_k_bubble;
+    int64_t overall_time_k_bubble;
+    gettimeofday(&tv_start_k_bubble, NULL);
+    key_bubble_sort(keys_to_sort_1, size);
+    gettimeofday(&tv_end_k_bubble, NULL);
+    overall_time_k_bubble =
+    (tv_end_k_bubble.tv_sec - tv_start_k_bubble.tv_sec) * 1000000LL + 
+    (tv_end_k_bubble.tv_usec - tv_start_k_bubble.tv_usec);
+
+    key_t keys_to_sort_2[MAX_TABLE_SIZE] = {0};
+    copy_key_array(key_table, keys_to_sort_2, size);
+    struct timeval tv_start_k_shell, tv_end_k_shell;
+    int64_t overall_time_k_shell;
+    gettimeofday(&tv_start_k_shell, NULL);
+    key_shell_sort(keys_to_sort_2, size);
+    gettimeofday(&tv_end_k_shell, NULL);
+    overall_time_k_shell =
+    (tv_end_k_shell.tv_sec - tv_start_k_shell.tv_sec) * 1000000LL + 
+    (tv_end_k_shell.tv_usec - tv_start_k_shell.tv_usec);
+
+    printf("---------------+------------------------+-"
+        "----------------\n");
+    printf("  Тип таблицы  | Пузырьковая сортировка | "
+        "Сортировка Шелла\n");
+    printf("---------------+------------------------+-"
+        "----------------\n");
+    printf("   Исходная    |%-24" PRId64 "|%-17" PRId64 "\n",
+        overall_time_bubble, overall_time_shell);
+    printf("   Ключей      |%-24" PRId64 "|%-17" PRId64 "\n",
+        overall_time_k_bubble, overall_time_k_shell);
+    printf("---------------+------------------------+-"
+        "----------------\n");
 }
