@@ -11,31 +11,22 @@ void print_instruction(void)
         "==========\n");
 }
 
-void print_info(void)
-{
-    printf("Расшифровка номеров материков:\n"
-        "1 - Африка\n2 - Австралия\n3 - Антарктида\n4 - Евразия\n"
-        "5 - Северная Америка\n6 - Южная Америка\n\n");
-    printf("Расшифровка номеров COVID-ограничений:\n"
-        "0 - отсутствуют\n1 - нужен ПЦР-тест\n2 - нужна вакцина\n\n");
-    printf("Расшифровка номеров основных видов туризма:\n"
-        "1 - экскурсионный\n2 - пляжный\n3 - спортивный\n\n");
-    printf("Расшифровка номеров видов экскурсий:\n"
-        "1 - природа\n2 - история\n3 - искусство\n\n");
-    printf("Расшифровка номеров видов спорта:\n"
-        "1 - горные лыжи\n2 - серфинг\n3 - восхождения\n\n");
-}
-
 void print_menu(void)
 {
-    printf("\nМеню\n"
-        "1 - Вывести информацию обо всех странах\n"
-        "2 - Вывести список стран на выбранном материке, где можно заняться\n"
-        "указанным видом спорта.\n"
-        "3 - Упорядочить таблицу по возрастанию населения, используя исходную\n"
-        "таблицу\n4 - Упорядочить таблицу по возрастанию населения, используя\n"
-        "таблицу ключей\n5 - Добавить запись в таблицу\n0 - Выйти из программы"
-        "\n\n");
+    printf("\n                                      Меню\n"
+        "1 - Считать данные из файла в таблицу.\n"
+        "2 - Вывести информацию обо всех странах.\n"
+        "3 - Вывести список стран на выбранном материке, где можно заняться "
+        "указанным\nвидом спорта.\n"
+        "4 - Упорядочить таблицу по возрастанию населения, используя исходную\n"
+        "таблицу.\n5 - Упорядочить таблицу по возрастанию населения, "
+        "используя\nтаблицу ключей.\n6 - Вывести упорядоченную исходную "
+        "таблицу.\n"
+        "7 - Вывести упорядоченную таблицу, используя таблицу ключей.\n"
+        "8 - Добавить элемент в конец таблицы.\n9 - Удалить элемент таблицы"
+        " по названию страны.\n"
+        "0 - Выйти из программы.\n"
+        "\n");
     printf("Введите номер меню: ");
 }
 
@@ -59,10 +50,7 @@ int scanf_country(FILE *stream, country_t *country)
     char temporary_buffer[NAME_SIZE + 1];
 
     if (fgets(temporary_buffer, NAME_SIZE + 2, stream) == NULL)
-    {   
-        printf("Error: incorrect country name\n");
         return EXIT_FAILURE;
-    }
 
     if (check_string(temporary_buffer) == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -77,24 +65,24 @@ int scanf_country(FILE *stream, country_t *country)
 
     strcpy(country->capital_name, temporary_buffer);
 
-    if (fscanf(stream, "%llu\n", &country->population) != 1)
+    if (fscanf(stream, "%lld\n", &country->population) != 1)
         return EXIT_FAILURE;
 
-    if (fscanf(stream, "%hu\n", &country->mainland) != 1)
+    if (fscanf(stream, "%hd\n", &country->mainland) != 1)
         return EXIT_FAILURE;
 
-    if (fscanf(stream, "%hu\n", &country->covid_vaccine) != 1)
+    if (fscanf(stream, "%hd\n", &country->covid_vaccine) != 1)
         return EXIT_FAILURE;
 
-    if (fscanf(stream, "%hu\n", &country->tourism_type_number) != 1)
+    if (fscanf(stream, "%hd\n", &country->tourism_type_number) != 1)
         return EXIT_FAILURE;
 
     if (country->tourism_type_number == 1)
     {
-        if (fscanf(stream, "%u\n", &country->tourism_type.excursion_type.objects_number) != 1)
+        if (fscanf(stream, "%d\n", &country->tourism_type.excursion_type.objects_number) != 1)
             return EXIT_FAILURE;
 
-        if (fscanf(stream, "%hu\n", &country->tourism_type.excursion_type.main_type) != 1)
+        if (fscanf(stream, "%hd\n", &country->tourism_type.excursion_type.main_type) != 1)
             return EXIT_FAILURE;
     }
 
@@ -103,7 +91,7 @@ int scanf_country(FILE *stream, country_t *country)
         if (fscanf(stream, "%lf\n", &country->tourism_type.beach_type.flight_time) != 1)
             return EXIT_FAILURE;
 
-        if (fscanf(stream, "%hu\n", &country->tourism_type.beach_type.main_season) != 1)
+        if (fscanf(stream, "%hd\n", &country->tourism_type.beach_type.main_season) != 1)
             return EXIT_FAILURE;
 
         if (fscanf(stream, "%hd\n", &country->tourism_type.beach_type.air_temperature) != 1)
@@ -115,10 +103,10 @@ int scanf_country(FILE *stream, country_t *country)
 
     if (country->tourism_type_number == 3)
     {
-        if (fscanf(stream, "%u\n", &country->tourism_type.sport_type.minimal_price) != 1)
+        if (fscanf(stream, "%d\n", &country->tourism_type.sport_type.minimal_price) != 1)
             return EXIT_FAILURE;
 
-        if (fscanf(stream, "%hu\n", &country->tourism_type.sport_type.sport_kind) != 1)
+        if (fscanf(stream, "%hd\n", &country->tourism_type.sport_type.sport_kind) != 1)
             return EXIT_FAILURE;
     }
 
@@ -142,8 +130,6 @@ int read_all_data(FILE *stream, country_t *array, key_t *key_array, size_t *size
 
         if (feof(stream))
             return EXIT_SUCCESS;
-
-        // fseek(stream, 2, SEEK_CUR);
     }
 
     return EXIT_SUCCESS;
@@ -245,73 +231,35 @@ char *get_season_name(const int number)
     return NULL;
 }
 
-void find_by_sport(FILE *stream, country_t *country, const int size)
+int find_by_sport(FILE *stream, country_t *country, const int size)
 {
-    int find_mainland = 0, find_sport = 0;
+    int find_mainland = 0, find_sport = 0, count = 0;
 
+    printf("Расшифровка номеров материков:\n"
+        "1 - Африка\n2 - Австралия\n3 - Антарктида\n4 - Евразия\n"
+        "5 - Северная Америка\n6 - Южная Америка\n");
     printf("Введите номер материка: ");
     scanf("%d", &find_mainland);
+    printf("Расшифровка номеров видов спорта:\n"
+        "1 - горные лыжи\n2 - серфинг\n3 - восхождения\n");
     printf("Введите номер вида спорта: ");
     scanf("%d", &find_sport);
-    printf("\n");
 
     for (size_t i = 0; i < size; i++)
         if (country[i].tourism_type_number == 3)
             if (country[i].mainland == find_mainland &&
                 country[i].tourism_type.sport_type.sport_kind == find_sport)
+            {
                 printf_country(stream, &country[i]);
+                count++;
+            }
+    return count;
 }
 
-void table_swap(country_t *country_1, country_t *country_2)
-{
-    country_t temporary = { 0 };
-
-    temporary = *country_1;
-    *country_1 = *country_2;
-    *country_2 = temporary;
-}
-
-void key_swap(key_t *key_1, key_t *key_2)
-{
-    key_t temporary = { 0 };
-
-    temporary = *key_1;
-    *key_1 = *key_2;
-    *key_2 = temporary;
-}
-
-int compare(unsigned long long *population_1, unsigned long long *population_2)
-{
-    if (*population_1 > *population_2)
-        return 1;
-
-    if (*population_1 < *population_2)
-        return -1;
-
-    return 0;
-}
-
-void table_bubble_sort(country_t *array, const int size)
-{
-    for (size_t i = 0; i < size - 1; i++)    
-        for (size_t j = 0; j < size - i - 1; j++)
-            if (compare(&array[j].population, &array[j + 1].population) > 0)
-                table_swap(&array[j], &array[j + 1]);
-}
-
-void key_bubble_sort(key_t *array, const int size)
-{
-    for (size_t i = 0; i < size - 1; i++)    
-        for (size_t j = 0; j < size - i - 1; j++)
-            if (compare(&array[j].key, &array[j + 1].key) > 0)
-                key_swap(&array[j], &array[j + 1]);
-}
-
-int insert_array(country_t *country, size_t *size)
+int array_push(country_t *country, size_t *size)
 {
     getchar();
     printf("Введите название страны: ");
-
     char temporary_buffer[NAME_SIZE + 1];
 
     if (fgets(temporary_buffer, NAME_SIZE + 2, stdin) == NULL)
@@ -332,55 +280,111 @@ int insert_array(country_t *country, size_t *size)
     strcpy(country->capital_name, temporary_buffer);
     printf("Введите население страны: ");
 
-    if (scanf("%llu", &country->population) != 1)
+    if (scanf("%lld", &country->population) != 1)
+    {
+        printf(RED"Ошибка: введены некорректные данные.\n"RESET);
         return EXIT_FAILURE;
+    }
+    if (country->population < 0)
+    {
+        printf(RED"Ошибка: население должно быть неотрицательным числом.\n"RESET);
+        return EXIT_FAILURE;
+    }
 
+    printf("Расшифровка номеров материков:\n"
+        "1 - Африка\n2 - Австралия\n3 - Антарктида\n4 - Евразия\n"
+        "5 - Северная Америка\n6 - Южная Америка\n");
     printf("Введите номер материка: ");
 
-    if (scanf("%hu", &country->mainland) != 1)
+    if (scanf("%hd", &country->mainland) != 1)
         return EXIT_FAILURE;
+    if (country->mainland < 1 || country->mainland > 6)
+    {
+        printf(RED"Ошибка: номер материка должен быть от 1 до 6.\n"RESET);
+        return EXIT_FAILURE;
+    }
 
+    printf("Расшифровка номеров COVID-ограничений:\n"
+        "0 - отсутствуют\n1 - нужен ПЦР-тест\n2 - нужна вакцина\n");
     printf("Введите номер COVID-ограничений: ");
 
-    if (scanf("%hu", &country->covid_vaccine) != 1)
+    if (scanf("%hd", &country->covid_vaccine) != 1)
         return EXIT_FAILURE;
+    if (country->covid_vaccine < 0 || country->covid_vaccine > 2)
+    {
+        printf(RED"Ошибка: номер COVID-ограничений должен быть от 0 до 2.\n"RESET);
+        return EXIT_FAILURE;
+    }
 
+    printf("Расшифровка номеров видов туризма:\n"
+        "1 - экскурсионный\n2 - пляжный\n3 - спортивный\n");
     printf("Введите номер вида туризма: ");
 
-    if (scanf("%hu", &country->tourism_type_number) != 1)
+    if (scanf("%hd", &country->tourism_type_number) != 1)
         return EXIT_FAILURE;
+    if (country->tourism_type_number < 1 || country->tourism_type_number > 3)
+    {
+        printf(RED"Ошибка: номер вида туризма должен быть от 1 до 3.\n"RESET);
+        return EXIT_FAILURE;
+    }
 
     if (country->tourism_type_number == 1)
     {
         printf("Введите количество объектов: ");
 
-        if (scanf("%u", &country->tourism_type.excursion_type.objects_number) != 1)
+        if (scanf("%d", &country->tourism_type.excursion_type.objects_number) != 1)
             return EXIT_FAILURE;
-
-        printf("Введите главный вид экскурсии: ");
-
-        if (scanf("%hu", &country->tourism_type.excursion_type.main_type) != 1)
+        if (country->tourism_type.excursion_type.objects_number < 0)
+        {
+            printf(RED"Ошибка: количество объектов должно быть неотрицательным.\n"RESET);
             return EXIT_FAILURE;
+        }
+
+        printf("Расшифровка номеров видов экскурсий:\n"
+            "1 - природа\n2 - история\n3 - искусство\n");
+        printf("Введите номер вида экскурсии: ");
+
+        if (scanf("%hd", &country->tourism_type.excursion_type.main_type) != 1)
+            return EXIT_FAILURE;
+        if (country->tourism_type.excursion_type.main_type < 1 ||
+            country->tourism_type.excursion_type.main_type > 3)
+        {
+            printf(RED"Ошибка: номер вида экскурсии должен быть от 1 до 3.\n"RESET);
+            return EXIT_FAILURE;
+        }
     }
 
     if (country->tourism_type_number == 2)
     {
-        printf("Введите время полета: ");
+        printf("Введите время полета в часах: ");
 
         if (scanf("%lf", &country->tourism_type.beach_type.flight_time) != 1)
             return EXIT_FAILURE;
+        if (country->tourism_type.beach_type.flight_time < 0)
+        {
+            printf(RED"Ошибка: время полета должно быть неотрицательным.\n"RESET);
+            return EXIT_FAILURE;
+        }
 
+        printf("Расшифровка номеров сезонов:\n"
+            "1 - зима\n2 - весна\n3 - лето\n4 - осень");
         printf("Введите основной сезон: ");
 
-        if (scanf("%hu", &country->tourism_type.beach_type.main_season) != 1)
+        if (scanf("%hd", &country->tourism_type.beach_type.main_season) != 1)
             return EXIT_FAILURE;
+        if (country->tourism_type.beach_type.main_season < 1 ||
+            country->tourism_type.beach_type.main_season > 4)
+        {
+            printf(RED"Ошибка: номер сезона должен быть от 1 до 4.\n"RESET);
+            return EXIT_FAILURE;
+        }
 
-        printf("Введите температуру воздуха: ");
+        printf("Введите температуру воздуха в градусах: ");
 
         if (scanf("%hd", &country->tourism_type.beach_type.air_temperature) != 1)
             return EXIT_FAILURE;
 
-        printf("Введите температуру воды: ");
+        printf("Введите температуру воды в градусах: ");
 
         if (scanf("%hd", &country->tourism_type.beach_type.water_temperature) != 1)
             return EXIT_FAILURE;
@@ -388,20 +392,63 @@ int insert_array(country_t *country, size_t *size)
 
     if (country->tourism_type_number == 3)
     {
-        printf("Введите минимальную стоимость: ");
+        printf("Введите минимальную стоимость в долларах: ");
 
-        if (scanf("%u", &country->tourism_type.sport_type.minimal_price) != 1)
+        if (scanf("%d", &country->tourism_type.sport_type.minimal_price) != 1)
             return EXIT_FAILURE;
+        if (country->tourism_type.sport_type.minimal_price < 0)
+        {
+            printf(RED"Ошибка: минимальная стоимость должга быть неотрицательной.\n"RESET);
+            return EXIT_FAILURE;
+        }
 
+        printf("Расшифровка номеров видов спорта:\n"
+        "1 - горные лыжи\n2 - серфинг\n3 - восхождения\n");
         printf("Введите вид спорта: ");
 
-        if (scanf("%hu", &country->tourism_type.sport_type.sport_kind) != 1)
+        if (scanf("%hd", &country->tourism_type.sport_type.sport_kind) != 1)
             return EXIT_FAILURE;
+        if (country->tourism_type.sport_type.sport_kind < 1 ||
+            country->tourism_type.sport_type.sport_kind > 3)
+        {
+            printf(RED"Ошибка: номер вида спорта должен быть от 1 до 3.\n"RESET);
+            return EXIT_FAILURE;
+        }
     }
 
     (*size)++;
 
     return EXIT_SUCCESS;
+}
+
+int array_remove(country_t *country, size_t *size)
+{
+    getchar();
+    char temporary_buffer[NAME_SIZE + 1];
+    printf("Введите название страны: ");
+    if (fgets(temporary_buffer, NAME_SIZE + 2, stdin) == NULL)
+    {   
+        printf("Ошибка: неверно введено название страны.\n");
+        return EXIT_FAILURE;
+    }
+    if (check_string(temporary_buffer) == EXIT_FAILURE)
+        return EXIT_FAILURE;
+    char find_country[NAME_SIZE + 1];
+    strcpy(find_country, temporary_buffer);
+    for (size_t i = 0; i < *size; i++)
+        if (strcmp(country[i].country_name, find_country) == 0)
+        {
+            if (*size == 1)
+            {
+                (*size)--;
+                return EXIT_SUCCESS;
+            }
+            for (int j = i; j < *size - 2; j++)
+                country[j] = country[j + 1];
+            (*size)--;
+            return EXIT_SUCCESS;
+        }
+    return EXIT_FAILURE;        
 }
 
 void printf_country(FILE *stream, country_t *country)
