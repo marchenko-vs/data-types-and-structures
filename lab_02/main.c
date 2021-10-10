@@ -47,7 +47,6 @@ int main(void)
                 return EXIT_FAILURE;
             }
             printf(GREEN"Данные из файла считаны успешно.\n"RESET);
-            printf("size: %lld", table_size);
         }
         else if (choice == 2)
         {
@@ -140,9 +139,12 @@ int main(void)
         }
         else if (choice == 10)
         {
-            country_t array_to_sort_1[MAX_TABLE_SIZE] = { 0 };
+            country_t array_to_sort_1[MAX_TABLE_SIZE] = {0};
+            country_t array_to_sort_2[MAX_TABLE_SIZE] = {0};
             copy_array(initial_table, array_to_sort_1, table_size);
+            copy_array(initial_table, array_to_sort_2, table_size);
             table_bubble_sort(array_to_sort_1, table_size);
+            table_shell_sort(array_to_sort_2, table_size);
         }
         else
             printf(RED"Ошибка: такого пункта меню не существует.\n"RESET);

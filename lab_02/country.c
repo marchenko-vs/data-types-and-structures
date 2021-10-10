@@ -24,7 +24,8 @@ void print_menu(void)
         "таблицу.\n"
         "7 - Вывести упорядоченную таблицу, используя таблицу ключей.\n"
         "8 - Добавить элемент в конец таблицы.\n9 - Удалить элемент таблицы"
-        " по названию страны.\n"
+        " по названию страны.\n10 - Сравнить время сортировки таблицы двумя " 
+        "алгоритмами.\n"
         "0 - Выйти из программы.\n"
         "\n");
     printf("Введите номер меню: ");
@@ -49,7 +50,7 @@ int scanf_country(FILE *stream, country_t *country)
 {
     char temporary_buffer[NAME_SIZE + 1];
 
-    if (fgets(temporary_buffer, NAME_SIZE + 2, stream) == NULL)
+    if (fgets(temporary_buffer, NAME_SIZE + 1, stream) == NULL)
         return EXIT_FAILURE;
 
     if (check_string(temporary_buffer) == EXIT_FAILURE)
@@ -57,7 +58,7 @@ int scanf_country(FILE *stream, country_t *country)
 
     strcpy(country->country_name, temporary_buffer);
 
-    if (fgets(temporary_buffer, NAME_SIZE + 2, stream) == NULL)
+    if (fgets(temporary_buffer, NAME_SIZE + 1, stream) == NULL)
         return EXIT_FAILURE;
 
     if (check_string(temporary_buffer) == EXIT_FAILURE)
@@ -262,7 +263,7 @@ int array_push(country_t *country, size_t *size)
     printf("Введите название страны: ");
     char temporary_buffer[NAME_SIZE + 1];
 
-    if (fgets(temporary_buffer, NAME_SIZE + 2, stdin) == NULL)
+    if (fgets(temporary_buffer, NAME_SIZE + 1, stdin) == NULL)
         return EXIT_FAILURE;
 
     if (check_string(temporary_buffer) == EXIT_FAILURE)
@@ -271,7 +272,7 @@ int array_push(country_t *country, size_t *size)
     strcpy(country->country_name, temporary_buffer);
     printf("Введите название столицы: ");
 
-    if (fgets(temporary_buffer, NAME_SIZE + 2, stdin) == NULL)
+    if (fgets(temporary_buffer, NAME_SIZE + 1, stdin) == NULL)
         return EXIT_FAILURE;
 
     if (check_string(temporary_buffer) == EXIT_FAILURE)
@@ -426,7 +427,7 @@ int array_remove(country_t *country, size_t *size)
     getchar();
     char temporary_buffer[NAME_SIZE + 1];
     printf("Введите название страны: ");
-    if (fgets(temporary_buffer, NAME_SIZE + 2, stdin) == NULL)
+    if (fgets(temporary_buffer, NAME_SIZE + 1, stdin) == NULL)
     {   
         printf("Ошибка: неверно введено название страны.\n");
         return EXIT_FAILURE;

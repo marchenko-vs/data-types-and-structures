@@ -1,5 +1,6 @@
 #include "sort.h"
 #include <sys/time.h>
+#include <inttypes.h>
 
 void table_swap(country_t *country_1, country_t *country_2)
 {
@@ -32,8 +33,7 @@ int compare(long long *population_1, long long *population_2)
 
 void table_bubble_sort(country_t *array, const int size)
 {
-    printf("size: %d", size);
-    struct timeval  tv1, tv2;
+    struct timeval tv1, tv2;
     gettimeofday(&tv1, NULL);
     
     for (size_t i = 0; i < size - 1; i++)    
@@ -42,9 +42,9 @@ void table_bubble_sort(country_t *array, const int size)
                 table_swap(&array[j], &array[j + 1]);
 
     gettimeofday(&tv2, NULL);
-    printf ("Total time = %f seconds\n",
-         (double) (tv2.tv_usec - tv1.tv_usec) / 1000000 +
-         (double) (tv2.tv_sec - tv1.tv_sec));
+    int64_t ans;
+    ans = (tv2.tv_usec - tv1.tv_usec) / 1000000 + (long double) (tv2.tv_sec - tv1.tv_sec);
+    printf ("Bubble sort time: %" PRId64 " ms\n", ans);
 }
 
 void key_bubble_sort(key_t *array, const int size)
@@ -57,6 +57,9 @@ void key_bubble_sort(key_t *array, const int size)
 
 void table_shell_sort(country_t *array, const int size)
 {
+    struct timeval tv1, tv2;
+    gettimeofday(&tv1, NULL);
+    
     int i, j, step;
     country_t tmp;
     for (step = size / 2; step > 0; step /= 2)
@@ -72,6 +75,10 @@ void table_shell_sort(country_t *array, const int size)
             }
             array[j] = tmp;
         }
+    gettimeofday(&tv2, NULL);
+    int64_t ans;
+    ans = (tv2.tv_usec - tv1.tv_usec) / 1000000 + (long double) (tv2.tv_sec - tv1.tv_sec);
+    printf ("Shell sort time: %" PRId64 " ms\n", ans);
 }
 
 void copy_array(country_t *array_1, country_t *array_2, const int size)
