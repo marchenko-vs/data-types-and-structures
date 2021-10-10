@@ -1,4 +1,8 @@
 #include "sort.h"
+#include "country.h"
+#include "country_array.h"
+#include <sys/time.h>
+#include <inttypes.h>
 
 int compare(long long *population_1, long long *population_2)
 {
@@ -81,4 +85,63 @@ void key_shell_sort(key_t *array, const int size)
             }
             array[j] = tmp;
         }
+}
+
+void sort_comparison(country_t *table, key_t *key_table, const int size)
+{
+    country_t array_to_sort_1[MAX_TABLE_SIZE] = {0};
+    copy_array(table, array_to_sort_1, size);
+    struct timeval tv_start_bubble, tv_end_bubble;
+    int64_t overall_time_bubble;
+    gettimeofday(&tv_start_bubble, NULL);
+    table_bubble_sort(array_to_sort_1, size);
+    gettimeofday(&tv_end_bubble, NULL);
+    overall_time_bubble =
+    (tv_end_bubble.tv_sec - tv_start_bubble.tv_sec) * 1000000LL + 
+    (tv_end_bubble.tv_usec - tv_start_bubble.tv_usec);
+
+    country_t array_to_sort_2[MAX_TABLE_SIZE] = {0};
+    copy_array(table, array_to_sort_2, size);
+    struct timeval tv_start_shell, tv_end_shell;
+    int64_t overall_time_shell;
+    gettimeofday(&tv_start_shell, NULL);
+    table_shell_sort(array_to_sort_2, size);
+    gettimeofday(&tv_end_shell, NULL);
+    overall_time_shell = (tv_end_shell.tv_sec - tv_start_bubble.tv_sec)
+    * 1000000LL + (tv_end_shell.tv_usec - tv_start_bubble.tv_usec);
+
+    key_t keys_to_sort_1[MAX_TABLE_SIZE] = {0};
+    copy_key_array(key_table, keys_to_sort_1, size);
+    struct timeval tv_start_k_bubble, tv_end_k_bubble;
+    int64_t overall_time_k_bubble;
+    gettimeofday(&tv_start_k_bubble, NULL);
+    key_bubble_sort(keys_to_sort_1, size);
+    gettimeofday(&tv_end_k_bubble, NULL);
+    overall_time_k_bubble =
+    (tv_end_k_bubble.tv_sec - tv_start_k_bubble.tv_sec) * 1000000LL + 
+    (tv_end_k_bubble.tv_usec - tv_start_k_bubble.tv_usec);
+
+    key_t keys_to_sort_2[MAX_TABLE_SIZE] = {0};
+    copy_key_array(key_table, keys_to_sort_2, size);
+    struct timeval tv_start_k_shell, tv_end_k_shell;
+    int64_t overall_time_k_shell;
+    gettimeofday(&tv_start_k_shell, NULL);
+    key_shell_sort(keys_to_sort_2, size);
+    gettimeofday(&tv_end_k_shell, NULL);
+    overall_time_k_shell =
+    (tv_end_k_shell.tv_sec - tv_start_k_shell.tv_sec) * 1000000LL + 
+    (tv_end_k_shell.tv_usec - tv_start_k_shell.tv_usec);
+
+    printf("---------------+------------------------+-"
+        "----------------\n");
+    printf("  Тип таблицы  | Пузырьковая сортировка | "
+        "Сортировка Шелла\n");
+    printf("---------------+------------------------+-"
+        "----------------\n");
+    printf("   Исходная    |%-24" PRId64 "|%-17" PRId64 "\n",
+        overall_time_bubble, overall_time_shell);
+    printf("   Ключей      |%-24" PRId64 "|%-17" PRId64 "\n",
+        overall_time_k_bubble, overall_time_k_shell);
+    printf("---------------+------------------------+-"
+        "----------------\n");
 }

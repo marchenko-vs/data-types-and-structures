@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define NAME_SIZE 50
-#define MAX_TABLE_SIZE 1000
+#define MAX_TABLE_SIZE 300
 
 #define TOO_MANY_STRUCTURES -1
 #define INVALID_DATA -2
@@ -24,13 +24,13 @@ typedef struct
 {
     double flight_time;
     short int main_season;
-    short int air_temperature;
-    short int water_temperature;
+    double air_temperature;
+    double water_temperature;
 } beach_t;
 
 typedef struct
 {
-    int minimal_price;
+    double minimal_price;
     short int sport_kind;
 } sport_t;
 
@@ -61,23 +61,13 @@ typedef struct
 void print_instruction(void);
 void print_menu(void);
 int check_string(char *string);
-int scanf_country(FILE *stream, country_t *country);
-int read_all_data(FILE *stream, country_t *array, key_t *key_array, size_t *size);
 char *get_mainland_name(const int number);
 char *get_covid_requirements(const int number);
 char *get_tourism_type(const int number);
 char *get_main_type(const int number);
 char *get_sports_type(const int number);
 char *get_season_name(const int number);
-int find_by_sport(FILE *stream, country_t *country, const int size);
-int array_push(country_t *country, size_t *size);
-int array_remove(country_t *country, size_t *size);
+int scanf_country(FILE *stream, country_t *country);
 void printf_country(FILE *stream, country_t *country);
-void print_all_data(FILE *stream, country_t *country, const int size);
-void print_by_keys(FILE *stream, country_t *country, key_t *keys, const int size);
-void copy_array(country_t *array_1, country_t *array_2, const int size);
-void copy_key_array(key_t *array_1, key_t *array_2, const int size);
-void print_keys_table(FILE *stream, key_t *array, const int size);
-void sort_comparison(country_t *table, key_t *key_table, const int size);
 
 #endif

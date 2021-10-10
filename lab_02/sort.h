@@ -11,5 +11,6 @@ void table_bubble_sort(country_t *array, const int size);
 void key_bubble_sort(key_t *array, const int size);
 void table_shell_sort(country_t *array, const int size);
 void key_shell_sort(key_t *array, const int size);
+void sort_comparison(country_t *table, key_t *key_table, const int size);
 
 #endif
