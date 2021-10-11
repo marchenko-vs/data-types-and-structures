@@ -1,4 +1,4 @@
-CFLAGS:=-std=c99 -Wall -Werror -Wvla -pedantic
+CFLAGS:=-std=c99 -Wvla -Wall -Werror -pedantic
 
 app.exe : main.o country.o sort.o country_array.o
 	gcc $^ -o app.exe

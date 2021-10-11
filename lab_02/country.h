@@ -56,7 +56,7 @@ typedef struct
 {
     size_t index;
     long long key;
-} key_t;
+} key_table_t;
 
 void print_instruction(void);
 void print_menu(void);

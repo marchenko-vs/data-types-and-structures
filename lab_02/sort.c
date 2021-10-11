@@ -24,9 +24,9 @@ void table_swap(country_t *country_1, country_t *country_2)
     *country_2 = temporary;
 }
 
-void key_swap(key_t *key_1, key_t *key_2)
+void key_swap(key_table_t *key_1, key_table_t *key_2)
 {
-    key_t temporary = { 0 };
+    key_table_t temporary = { 0 };
 
     temporary = *key_1;
     *key_1 = *key_2;
@@ -41,7 +41,7 @@ void table_bubble_sort(country_t *array, const int size)
                 table_swap(&array[j], &array[j + 1]);
 }
 
-void key_bubble_sort(key_t *array, const int size)
+void key_bubble_sort(key_table_t *array, const int size)
 {
     for (size_t i = 0; i < size - 1; i++)    
         for (size_t j = 0; j < size - i - 1; j++)
@@ -68,10 +68,10 @@ void table_shell_sort(country_t *array, const int size)
         }
 }
 
-void key_shell_sort(key_t *array, const int size)
+void key_shell_sort(key_table_t *array, const int size)
 { 
     int i, j, step;
-    key_t tmp;
+    key_table_t tmp;
     for (step = size / 2; step > 0; step /= 2)
         for (i = step; i < size; i++)
         {
@@ -87,7 +87,7 @@ void key_shell_sort(key_t *array, const int size)
         }
 }
 
-void sort_comparison(country_t *table, key_t *key_table, const int size)
+void sort_comparison(country_t *table, key_table_t *key_table, const int size)
 {
     country_t array_to_sort_1[MAX_TABLE_SIZE] = {0};
     copy_array(table, array_to_sort_1, size);
@@ -110,7 +110,7 @@ void sort_comparison(country_t *table, key_t *key_table, const int size)
     overall_time_shell = (tv_end_shell.tv_sec - tv_start_bubble.tv_sec)
     * 1000000LL + (tv_end_shell.tv_usec - tv_start_bubble.tv_usec);
 
-    key_t keys_to_sort_1[MAX_TABLE_SIZE] = {0};
+    key_table_t keys_to_sort_1[MAX_TABLE_SIZE] = {0};
     copy_key_array(key_table, keys_to_sort_1, size);
     struct timeval tv_start_k_bubble, tv_end_k_bubble;
     int64_t overall_time_k_bubble;
@@ -121,7 +121,7 @@ void sort_comparison(country_t *table, key_t *key_table, const int size)
     (tv_end_k_bubble.tv_sec - tv_start_k_bubble.tv_sec) * 1000000LL + 
     (tv_end_k_bubble.tv_usec - tv_start_k_bubble.tv_usec);
 
-    key_t keys_to_sort_2[MAX_TABLE_SIZE] = {0};
+    key_table_t keys_to_sort_2[MAX_TABLE_SIZE] = {0};
     copy_key_array(key_table, keys_to_sort_2, size);
     struct timeval tv_start_k_shell, tv_end_k_shell;
     int64_t overall_time_k_shell;

@@ -14,7 +14,7 @@ int main(void)
     setbuf(stdout, NULL); // Отключение буферизации
 
     country_t initial_table[MAX_TABLE_SIZE] = {0}; // Инициализация двух таблиц
-    key_t key_table[MAX_TABLE_SIZE] = {0};
+    key_table_t key_table[MAX_TABLE_SIZE] = {0};
     size_t table_size = 0;
 
     print_instruction();
@@ -122,7 +122,7 @@ int main(void)
                 printf(RED"Ошибка: таблица переполнена.\n"RESET);
                 continue;
             }
-            if (array_push(&initial_table[table_size], &table_size))
+            if (array_push(&initial_table[table_size], &key_table[table_size], &table_size))
             {
                 getchar();
                 continue;

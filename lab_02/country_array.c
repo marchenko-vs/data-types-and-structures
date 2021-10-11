@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int read_all_data(FILE *stream, country_t *array, key_t *key_array, size_t *size)
+int read_all_data(FILE *stream, country_t *array, key_table_t *key_array, size_t *size)
 {
     while (!feof(stream))
     {
@@ -50,7 +50,7 @@ int find_by_sport(FILE *stream, country_t *country, const int size)
     return count;
 }
 
-int array_push(country_t *country, size_t *size)
+int array_push(country_t *country, key_table_t *key, size_t *size)
 {
     getchar();
     printf("Введите название страны: ");
@@ -161,7 +161,7 @@ int array_push(country_t *country, size_t *size)
         }
 
         printf("Расшифровка номеров сезонов:\n"
-            "1 - зима\n2 - весна\n3 - лето\n4 - осень");
+            "1 - зима\n2 - весна\n3 - лето\n4 - осень\n");
         printf("Введите основной сезон: ");
 
         if (scanf("%hd", &country->tourism_type.beach_type.main_season) != 1)
@@ -209,7 +209,9 @@ int array_push(country_t *country, size_t *size)
             return EXIT_FAILURE;
         }
     }
-
+	
+	key->index = *size;
+    key->key = country->population;
     (*size)++;
 
     return EXIT_SUCCESS;
@@ -251,7 +253,7 @@ void print_all_data(FILE *stream, country_t *country, const int size)
         printf_country(stream, &country[i]);
 }
 
-void print_by_keys(FILE *stream, country_t *country, key_t *keys, const int size)
+void print_by_keys(FILE *stream, country_t *country, key_table_t *keys, const int size)
 {
     for (size_t i = 0; i < size; i++)
         printf_country(stream, &country[keys[i].index]);
@@ -263,18 +265,18 @@ void copy_array(country_t *array_1, country_t *array_2, const int size)
         array_2[i] = array_1[i];
 }
 
-void copy_key_array(key_t *array_1, key_t *array_2, const int size)
+void copy_key_array(key_table_t *array_1, key_table_t *array_2, const int size)
 {
     for (size_t i = 0; i < size; i++)
         array_2[i] = array_1[i];
 }
 
-void print_keys_table(FILE *stream, key_t *array, const int size)
+void print_keys_table(FILE *stream, key_table_t *array, const int size)
 {
     printf("----------+----------+------------------\n");
     printf("  Номер   |  Индекс  |      Население     \n");
     printf("----------+----------+------------------\n");
     for (size_t i = 0; i < size; i++)
-        printf("%-10lld|%-10lld|%-20lld\n", i, array[i].index, array[i].key);
+        printf("%-10ld|%-10ld|%-20lld\n", i, array[i].index, array[i].key);
     printf("----------+----------+--------------------\n");
 }
