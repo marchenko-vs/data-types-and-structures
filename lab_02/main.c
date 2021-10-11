@@ -65,7 +65,7 @@ int main(void)
                 continue;
             }
             if (find_by_sport(stdout, initial_table, table_size) < 1)
-                printf(GREEN"Не найдены записи, удовлетворяющие Вашим "
+                printf(RED"Ошибка: не найдены записи, удовлетворяющие Вашим "
                     "требованиям."RESET"\n");
         }
         else if (choice == 3)
@@ -140,7 +140,7 @@ int main(void)
             if (array_remove(initial_table, &table_size) != EXIT_SUCCESS)
             {
                 printf(RED"Ошибка: страна с данным названием не "
-                    "найдена\n"RESET);
+                    "найдена.\n"RESET);
                 continue;
             }
             printf(GREEN"Запись успешно удалена.\n"RESET);
