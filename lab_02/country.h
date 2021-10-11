@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define NAME_SIZE 50
-#define MAX_TABLE_SIZE 300
+#define MAX_TABLE_SIZE 1000
 
 #define TOO_MANY_STRUCTURES -1
 #define INVALID_DATA -2

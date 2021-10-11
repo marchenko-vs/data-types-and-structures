@@ -1,6 +1,7 @@
 #include "country.h"
 #include "country_array.h"
 #include "sort.h"
+#include "info.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,7 +34,7 @@ int main(void)
 
         if (choice == 0)
         {
-            printf("Работа программы завершена.\n");
+            printf(GREEN"Работа программы успешно завершена.\n"RESET);
             break;
         }
         else if (choice == 1)
@@ -75,7 +76,7 @@ int main(void)
                 continue;
             }
             table_shell_sort(initial_table, table_size);
-            printf("Таблица успешно отсортирована.\n");
+            printf(GREEN"Таблица успешно отсортирована.\n"RESET);
         }
         else if (choice == 4)
         {
@@ -85,7 +86,7 @@ int main(void)
                 continue;
             }
             key_shell_sort(key_table, table_size);
-            printf("Таблица ключей успешно отсортирована.\n");
+            printf(GREEN"Таблица ключей успешно отсортирована.\n"RESET);
         }
         else if (choice == 5)
         {

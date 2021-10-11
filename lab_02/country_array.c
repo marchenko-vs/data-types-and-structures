@@ -250,13 +250,19 @@ int array_remove(country_t *country, size_t *size)
 void print_all_data(FILE *stream, country_t *country, const int size)
 {
     for (size_t i = 0; i < size; i++)
+    {
         printf_country(stream, &country[i]);
+        printf("\n");
+    }
 }
 
 void print_by_keys(FILE *stream, country_t *country, key_table_t *keys, const int size)
 {
     for (size_t i = 0; i < size; i++)
+    {
         printf_country(stream, &country[keys[i].index]);
+        printf("\n");
+    }
 }
 
 void copy_array(country_t *array_1, country_t *array_2, const int size)
@@ -277,6 +283,6 @@ void print_keys_table(FILE *stream, key_table_t *array, const int size)
     printf("  Номер   |  Индекс  |      Население     \n");
     printf("----------+----------+------------------\n");
     for (size_t i = 0; i < size; i++)
-        printf("%-10ld|%-10ld|%-20lld\n", i, array[i].index, array[i].key);
+        printf("%-10zd|%-10zd|%-20lld\n", i, array[i].index, array[i].key);
     printf("----------+----------+--------------------\n");
 }

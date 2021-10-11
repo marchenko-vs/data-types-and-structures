@@ -1,19 +1,27 @@
-CFLAGS:=-std=c99 -Wvla -Wall -Werror -pedantic
+CC := gcc
+CFLAGS := -std=c99 -Wvla -Wall -Werror -Wpedantic
+OBJS := out/main.o out/country.o out/sort.o out/country_array.o out/info.o
 
-app.exe : main.o country.o sort.o country_array.o
-	gcc $^ -o app.exe
+app.exe : out/ out/main.o out/country.o out/sort.o out/country_array.o out/info.o
+	$(CC) $(OBJS) -o app.exe
 
-main.o : main.c
-	gcc $(CFLAGS) main.c -c
+out/main.o : main.c country.h country_array.h sort.h info.h
+	$(CC) $(CFLAGS) $< -c -o out/main.o
 
-country.o : country.c country.h
-	gcc $(CFLAGS) country.c -c
+out/country.o : country.c country.h
+	$(CC) $(CFLAGS) $< -c -o out/country.o
 
-country_array.o : country_array.c country_array.h
-	gcc $(CFLAGS) country_array.c -c
+out/country_array.o : country_array.c country_array.h
+	$(CC) $(CFLAGS) $< -c -o out/country_array.o
 
-sort.o : sort.c sort.h
-	gcc $(CFLAGS) sort.c -c
+out/sort.o : sort.c sort.h
+	$(CC) $(CFLAGS) $< -c -o out/sort.o
+
+out/info.o : info.c info.h
+	$(CC) $(CFLAGS) $< -c -o out/info.o
+
+out/ :
+	mkdir out/
 
 clean :
-	rm *.o *.exe
+	rm -rf *.o *.exe out/
