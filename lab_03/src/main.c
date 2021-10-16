@@ -1,221 +1,195 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <sys/time.h>
 #include <inttypes.h>
+#include "matrix.h"
+#include "sparse_matrix.h"
 
-#define ARGS_ERROR 1
-#define FILE_ERROR 2
-#define DATA_TYPE_ERROR 3
-
-#define M 100
-#define N 100
-
-typedef struct
-{
-    double *values;
-    int *cols;
-    int *list;
-} sparse_t;
-
-void print_result(double *vector, int size)
-{
-    printf("Полученный вектор-столбец:\n");
-    for (size_t i = 0; i < size; i++)
-        printf("%.2lf\n", vector[i]);
-}
-
-void print_lf_vector(double *vector, int size)
-{
-    for (size_t i = 0; i < size; i++)
-        printf("%.2lf ", vector[i]);
-}
-
-void print_d_vector(int *vector, int size)
-{
-    for (size_t i = 0; i < size; i++)
-        printf("%d ", vector[i]);
-}
-
-void print_matrix(double (*matrix)[N], int rows, int cols)
-{
-    for (size_t i = 0; i < rows; i++)
-    {
-        for (size_t j = 0; j < cols; j++)
-            printf("%lf ", matrix[i][j]);
-        printf("\n");
-    }   
-}
-
-void multiply(double (*matrix)[N], int rows, int cols, double *vector, double *res_vector)
-{
-    for (size_t i = 0; i < rows; i++)
-    {
-        double res_elem = 0;
-        for (size_t j = 0; j < cols; j++)
-            res_elem += matrix[i][j] * vector[j];
-        res_vector[i] = res_elem;
-    }
-}
+#define FILE_ERROR 1
+#define MEMORY_ALLOCATION_ERROR 3
 
 int main(void)
 {
-    setbuf(stdout, NULL);
+    setbuf(stdout, NULL); // Отключение буферизации вывода
     
-    int matrix_rows = 0, matrix_cols = 0;
+    matrix_t init_matrix = {.rows = 0, .columns = 0};
     printf("Введите размер матрицы через пробел (строки, столбцы): ");
-    if (fscanf(stdin, "%d%d", &matrix_rows, &matrix_cols) != 2)
+
+    if (fscanf(stdin, "%d%d", &init_matrix.rows, &init_matrix.columns) != 2)
     {
+        printf("Ошибка: размеры матрицы должны быть положительными целыми "
+            "числами.\n");
+
         return DATA_TYPE_ERROR;
     }
-    if (matrix_rows < 1 || matrix_cols < 1)
+
+    if (init_matrix.rows < 1 || init_matrix.columns < 1)
     {
+        printf("Ошибка: размеры матрицы должны быть положительными целыми.\n");
+
         return EXIT_FAILURE;
     }
 
-    int vector_rows = 0;
+    matrix_t init_vector = {.rows = 0, .columns = 1};
     printf("Введите количество строк вектора-столбца: ");
-    if (fscanf(stdin, "%d", &vector_rows) != 1)
+
+    if (fscanf(stdin, "%d", &init_vector.rows) != 1)
     {
+        printf("Ошибка: количество строк вектора-столбца должно быть "
+            "положительным целым числом.\n");
+
         return DATA_TYPE_ERROR;
     }
-    if (vector_rows < 1)
+
+    if (init_vector.rows < 1)
     {
+        printf("Ошибка: количество строк вектора-столбца должно быть "
+            "положительным.\n");
+
         return EXIT_FAILURE;
     }
 
-    if (matrix_cols != vector_rows)
+    if (init_matrix.columns != init_vector.rows)
     {
-        printf("Ошибка: число столбцов матрицы должно равняться числу строк"
-            " вектора-столбца.\n");
+        printf("Ошибка: число столбцов матрицы должно равняться числу строк "
+            "вектора-столбца.\n");
+
         return EXIT_FAILURE;
     }
 
-    double init_matrix[M][N];
-    double *init_vector = calloc(vector_rows, sizeof(double));
+    if (!m_allocate(&init_matrix))
+    {
+        printf("Ошибка: не удалось выделить память под матрицу.\n");
+
+        return MEMORY_ALLOCATION_ERROR;
+    }
+
+    if (!m_allocate(&init_vector))
+    {
+        printf("Ошибка: не удалось выделить память под вектор-столбец.\n");
+        m_free(&init_matrix);
+
+        return MEMORY_ALLOCATION_ERROR;
+    }
 
     printf("Введите элементы матрицы:\n");
-    for (size_t i = 0; i < matrix_rows; i++)
-        for (size_t j = 0; j < matrix_cols; j++)
-            if (fscanf(stdin, "%lf", &init_matrix[i][j]) != 1)
-            {
-                free(init_vector);
-                return DATA_TYPE_ERROR;
-            }
+
+    if (m_fill(&init_matrix) == DATA_TYPE_ERROR)
+    {
+        printf("Ошибка: элементы матрицы должны быть вещественными "
+            "числами.\n");
+
+        return DATA_TYPE_ERROR;
+    }
 
     printf("Введите элементы вектора-столбца:\n");
-    for (size_t i = 0; i < vector_rows; i++)
-        if (fscanf(stdin, "%lf", &init_vector[i]) != 1)
-        {
-            free(init_vector);
-            return DATA_TYPE_ERROR;
-        }
+
+    if (m_fill(&init_vector) == DATA_TYPE_ERROR)
+    {
+        printf("Ошибка: элементы вектора-столбца должны быть вещественными "
+            "числами.\n");
+        m_free(&init_matrix);
+
+        return DATA_TYPE_ERROR;
+    }
 
     int choice = 0;
     printf("Введите номер метода умножения матрицы на вектор-столбец: ");
+
     if (scanf("%d", &choice) != 1)
     {
+        printf("Ошибка: номер должен быть числом от 1 до 2.\n");
+        m_free(&init_matrix);
+        m_free(&init_vector);
+
         return DATA_TYPE_ERROR;
     }
+
     if (choice < 1 || choice > 3)
     {
+        printf("Ошибка: номер должен быть числом от 1 до 2.\n");
+        m_free(&init_matrix);
+        m_free(&init_vector);
+
         return EXIT_FAILURE;
     }
 
     if (choice == 1)
     {
-        double *res_vector = calloc(matrix_cols, sizeof(double));
-        size_t matrix_non_zero = 0;
-        for (size_t i = 0; i < matrix_rows; i++)
-            for (size_t j = 0; j < matrix_cols; j++)
-                if (init_matrix[i][j] != 0)
-                    matrix_non_zero++;
-        sparse_t sparse_martix;
-        sparse_martix.values = calloc(matrix_non_zero, sizeof(double));
-        sparse_martix.cols = calloc(matrix_non_zero, sizeof(int));
-        sparse_martix.list = calloc(matrix_rows + 1, sizeof(int));
-        size_t k = 0, l = 0;
-        for (size_t i = 0; i < matrix_rows; i++)
+        sparse_matrix_t sparse_matrix = {.non_zero = 0};
+
+        if (!sm_allocate(&sparse_matrix, &init_matrix))
         {
-            bool flag = false;
-            for (size_t j = 0; j < matrix_cols; j++)
-            {
-                if (init_matrix[i][j] != 0)
-                {
-                    if (!flag)
-                    {
-                        sparse_martix.list[l++] = k + 1;
-                        flag = true;
-                    }
-                    sparse_martix.values[k] = init_matrix[i][j];
-                    sparse_martix.cols[k] = j + 1;
-                    k++;
-                }
-            }
-            if (!flag)
-                sparse_martix.list[l++] = k + 1;
-        }
-        sparse_martix.list[l] = matrix_non_zero + 1;
+            printf("Ошибка: не удалось выделить память.\n");
+            m_free(&init_matrix);
+            m_free(&init_vector);
 
-        size_t vector_non_zero = 0;
-        for (size_t i = 0; i < vector_rows; i++)
-            if (init_vector[i] != 0)
-                vector_non_zero++;
-        sparse_t sparse_vector;
-        sparse_vector.values = calloc(vector_non_zero, sizeof(double));
-        sparse_vector.cols = calloc(vector_non_zero, sizeof(int));
-        sparse_vector.list = calloc(vector_rows + 1, sizeof(int));
-        k = 0, l = 0;
-        for (size_t i = 0; i < vector_rows; i++)
+            return MEMORY_ALLOCATION_ERROR;
+        }
+
+        matrix_t res_vector = {.rows = init_matrix.rows, .columns = 1};
+
+        if (!m_allocate(&res_vector))
         {
-            if (init_vector[i] != 0)
-            {
-                sparse_vector.values[k] = init_vector[i];
-                sparse_vector.list[l++] = k + 1;
-                sparse_vector.cols[k] = 1;
-                k++;
-            }
-            else
-                sparse_vector.list[l++] = k + 1;
+            printf("Ошибка: не удалось выделить память под вектор-столбец.\n");
+            m_free(&init_matrix);
+            m_free(&init_vector);
+
+            return MEMORY_ALLOCATION_ERROR;
         }
-        sparse_vector.list[l] = vector_non_zero + 1;
+        
+        sm_fill(&sparse_matrix, &init_matrix);
 
-        for (size_t i = 0; i < matrix_rows; i++)
-        {
-            double tmp_elem = 0;
-            for (int j = sparse_martix.list[i] - 1; j < sparse_martix.list[i + 1] - 1; j++)
-                tmp_elem += sparse_martix.values[j] * sparse_vector.values[j % vector_rows];
-            res_vector[i] = tmp_elem;
-        }
-        print_result(res_vector, matrix_cols);
-
-        free(sparse_martix.values);
-        free(sparse_martix.cols);
-        free(sparse_martix.list);
-
-        free(sparse_vector.values);
-        free(sparse_vector.cols);
-        free(sparse_vector.list);
-
-        free(res_vector);
-    }
-    if (choice == 2)
-    {
-        double *res_vector = calloc(matrix_cols, sizeof(double));
         struct timeval tv_start, tv_stop;
         int64_t seconds;
+
         gettimeofday(&tv_start, NULL);
-        multiply(init_matrix, matrix_rows, matrix_cols, init_vector, res_vector);
+        sm_multiply(&sparse_matrix, &init_vector, &res_vector);
         gettimeofday(&tv_stop, NULL);
+
         seconds = (tv_stop.tv_sec - tv_start.tv_sec) * 1000000LL +
         (tv_stop.tv_usec - tv_start.tv_usec);
-        print_result(res_vector, matrix_rows);
-        printf("%" PRId64 "\n", seconds);
 
-        free(res_vector);
-        free(init_vector);
+        printf("Получившийся вектор-столбец:\n");
+        m_print(&res_vector);
+        printf("Время умножения: %" PRId64 " ms.\n", seconds);
+
+        m_free(&res_vector);
     }
+
+    if (choice == 2)
+    {
+        matrix_t res_vector = {.rows = init_matrix.columns, .columns = 1};
+
+        if (!m_allocate(&res_vector))
+        {
+            m_free(&init_matrix);
+            m_free(&init_vector);
+            m_free(&res_vector);
+
+            return MEMORY_ALLOCATION_ERROR;
+        }
+
+        struct timeval tv_start, tv_stop;
+        int64_t seconds;
+
+        gettimeofday(&tv_start, NULL);
+        m_multiply(&init_matrix, &init_vector, &res_vector);
+        gettimeofday(&tv_stop, NULL);
+
+        seconds = (tv_stop.tv_sec - tv_start.tv_sec) * 1000000LL +
+        (tv_stop.tv_usec - tv_start.tv_usec);
+
+        printf("Получившийся вектор-столбец:\n");
+        m_print(&res_vector);
+        printf("Время умножения: %" PRId64 " ms.\n", seconds);
+
+        m_free(&res_vector);
+    }
+
+    m_free(&init_matrix);
+    m_free(&init_vector);
 
     return EXIT_SUCCESS;
 }
