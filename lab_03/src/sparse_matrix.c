@@ -73,9 +73,9 @@ void sm_fill(sparse_matrix_t *sparse_matrix, matrix_t *matrix)
 }
 
 void sm_multiply(sparse_matrix_t *sparse_matrix, matrix_t *vector,
-    matrix_t *result)
+    matrix_t *result, const int rows)
 {
-    for (size_t i = 0; i < vector->rows; i++)
+    for (size_t i = 0; i < rows; i++)
         {
             double result_element = 0;
 
@@ -86,4 +86,31 @@ void sm_multiply(sparse_matrix_t *sparse_matrix, matrix_t *vector,
 
             result->elements[i][0] = result_element;
         }
+}
+
+void sm_free(sparse_matrix_t *sparse_matrix)
+{
+    free(sparse_matrix->elements);
+    free(sparse_matrix->columns);
+    free(sparse_matrix->row_pointers);
+}
+
+void sm_print(sparse_matrix_t *sparse_matrix, const int rows)
+{
+    printf("Значения ненулевых элементов: ");
+
+    for (size_t i = 0; i < sparse_matrix->non_zero; i++)
+        printf("%.2lf ", sparse_matrix->elements[i]);
+
+    printf("\nЗначения столбцов соответствующих элементов: ");
+
+    for (size_t i = 0; i < sparse_matrix->non_zero; i++)
+        printf("%d ", sparse_matrix->columns[i]);
+
+    printf("\nЗначения указателей на строки: ");
+
+    for (size_t i = 0; i < rows + 1; i++)
+        printf("%d ", sparse_matrix->row_pointers[i]);
+
+    printf("\n");
 }

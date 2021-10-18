@@ -1,6 +1,8 @@
 #ifndef _MATRIX_H_
 #define _MATRIX_H_
 
+#include <stdio.h>
+
 #define DATA_TYPE_ERROR 2
 
 typedef struct
@@ -12,7 +14,7 @@ typedef struct
 
 void m_free(matrix_t *matrix);
 double **m_allocate(matrix_t *matrix);
-int m_fill(matrix_t *matrix);
+int m_fill(FILE *stream, matrix_t *matrix);
 void m_multiply(matrix_t *matrix, matrix_t *vector, matrix_t *result);
 void m_print(matrix_t *matrix);
 

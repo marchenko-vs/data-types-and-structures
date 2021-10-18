@@ -14,6 +14,8 @@ typedef struct
 double *sm_allocate(sparse_matrix_t *sparse_matrix, matrix_t *matrix);
 void sm_fill(sparse_matrix_t *sparse_matrix, matrix_t *matrix);
 void sm_multiply(sparse_matrix_t *sparse_matrix, matrix_t *vector,
-    matrix_t *result);
+    matrix_t *result, const int rows);
+void sm_free(sparse_matrix_t *sparse_matrix);
+void sm_print(sparse_matrix_t *sparse_matrix, const int rows);
 
 #endif // _SPARSE_MATRIX_H_

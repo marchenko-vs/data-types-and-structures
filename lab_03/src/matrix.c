@@ -32,11 +32,11 @@ double **m_allocate(matrix_t *matrix)
     return matrix->elements;
 }
 
-int m_fill(matrix_t *matrix)
+int m_fill(FILE *stream, matrix_t *matrix)
 {
     for (size_t i = 0; i < matrix->rows; i++)
         for (size_t j = 0; j < matrix->columns; j++)
-            if (fscanf(stdin, "%lf", &matrix->elements[i][j]) != 1)
+            if (fscanf(stream, "%lf", &matrix->elements[i][j]) != 1)
             {
                 m_free(matrix);
 
