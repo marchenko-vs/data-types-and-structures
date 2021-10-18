@@ -22,7 +22,7 @@ int main(void)
     print_input_format();
     if (scanf("%hd", &choice) != 1)
     {
-        printf("Ошибка: неккоректно введен номер способа ввода данных.\n");
+        printf("Ошибка: некорректно введен номер способа ввода данных.\n");
         return DATA_TYPE_ERROR;
     }
 
@@ -274,7 +274,7 @@ int main(void)
     }
     else
     {
-        printf("Ошибка: формат вывода должен быть числом от 1 до 2.\n");
+        printf("Ошибка: алгоритм умножения должен быть числом от 1 до 2.\n");
         m_free(&init_matrix);
         m_free(&init_vector);
         m_free(&res_vector);
