@@ -42,10 +42,19 @@ int main(void)
 
         getchar();
 
+        if (option < 0 || option > 10)
+        {
+            printf(RED"Ошибка: пункт меню должен быть от 0 до 10.\n"RESET);
+        }
+
         if (option == 1)
         {
-            if (array_check_brackets(MAX_SIZE) == EXIT_SUCCESS)
+            int rc = array_check_brackets(MAX_SIZE);
+            
+            if (rc == EXIT_SUCCESS)
                 printf(GREEN"Выражение корректно.\n"RESET);
+            else if (rc == ERR_INPUT_STRING)
+                printf(RED"Ошибка: пустая входная строка.\n"RESET);
             else
                 printf(RED"Выражение некорректно.\n"RESET);
         }

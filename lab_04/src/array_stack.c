@@ -74,7 +74,13 @@ int array_check_brackets(size_t size)
     }
 
     printf("Введите выражение:\n");
-    fgets(input_string, size, stdin);
+
+    if (!fgets(input_string, size, stdin))
+        return ERR_INPUT_STRING;
+
+    if (strlen(input_string) == 1)
+        return ERR_INPUT_STRING;
+
     input_string[strlen(input_string) - 1] = '\0';
 
     char *end_elem = array_stack + size;

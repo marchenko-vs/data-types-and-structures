@@ -2,6 +2,7 @@
 #define _LIST_STACK_H_
 
 #define ERR_MEMORY_ALLOC -3
+#define ERR_INPUT_STRING -4
 
 struct node
 {

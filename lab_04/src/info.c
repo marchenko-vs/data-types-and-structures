@@ -90,7 +90,7 @@ void efficiency_analysis(unsigned long long size)
     unsigned long long list_memory = sizeof(last_elem) + 
         sizeof(struct node) * size;
 
-    printf("   Список   |%1llu - %-11llu|", sizeof(last_elem), list_memory);
+    printf("   Список   |%1lu - %-11llu|", sizeof(last_elem), list_memory);
 
     rdtscll(time_start);
 
