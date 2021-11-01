@@ -11,7 +11,13 @@ void print_introduction(void)
     printf("==================================================================="
         "=============\n                            Лабораторная работа #4\n"
         "======================================================================"
-        "==========\n");
+        "==========\n\nВ данной программе реализован стек двумя способами: "
+        "на основе динамического\nмассива и односвязного линейного списка. "
+        "Доступны следующие операции:\nдобавление элемента в стек, удаление "
+        "элемента, просмотр текущего состояния\nстека, проверка правильности "
+        "расстановки скобок трех типов в выражении.\nТребования к входным "
+        "данным:\n1. Строка не должна быть пустой.\n2. Длина строки не должна "
+        "превышать 1000 символов.\n3. Элементы стека - символы.\n\n");
 }
 
 void print_menu(void)
@@ -29,31 +35,31 @@ void print_menu(void)
         "7. Удалить элемент из стека на основе односвязного линейного списка.\n"
         "8. Просмореть текущее состояние стека на основе "
         "односвязного линейного списка.\n"
-        "9. Проинициализировать свободную область в стеке на основе "
-        "односвязного линейного списка.\n"
-        "10. Провести анализ эффективности (по памяти и времени) реализаций "
+        "9. Провести анализ эффективности (по памяти и времени) реализаций "
         "стека\nна основе динамического массива и односвязного линейного "
         "списка.\n"
         "0. Завершить выполнение программы.\n"
         "Введите пункт меню: ");
 }
 
-void efficiency_analysis(unsigned long long size)
+void efficiency_analysis(unsigned long size)
 {
-    printf(GREEN"Анализ эффективности при %llu элементах.\n"RESET, size);
+    printf(GREEN"Анализ эффективности при %lu элементах.\n"RESET, size);
 
     unsigned long long time_start, time_end;
+    array_stack_t array_stack = { NULL, NULL, NULL };
 
-    char *array_stack = malloc(size * sizeof(char));
+    array_stack.stack = malloc(size * sizeof(char));
 
-    if (!array_stack)
+    if (!array_stack.stack)
     {
         printf(RED"Ошибка: не удалось выделить память под стек.\n"RESET);
 
         return;
     }
 
-    char *ptr_curr = array_stack - 1;
+    array_stack.last_elem = array_stack.stack + size;
+    array_stack.curr_elem = array_stack.stack - 1;
 
     printf("------------+---------------+----------------------------+-"
         "-------------------------\n");
@@ -62,14 +68,15 @@ void efficiency_analysis(unsigned long long size)
     printf("------------+---------------+----------------------------+-"
         "-------------------------\n");
 
-    unsigned long long array_memory = size * sizeof(char) + sizeof(ptr_curr);
+    unsigned long long array_memory = size * sizeof(char) + 
+        sizeof(array_stack.curr_elem) + sizeof(array_stack.last_elem);
 
     printf("   Массив   |%-15llu|", array_memory);
 
     rdtscll(time_start);
 
-    for (unsigned long long i = 0; i < size; i++)
-        push_array(&ptr_curr, array_stack + size - 1, 'q');
+    for (unsigned long long i = 0; i < size - 1; i++)
+        push_array(&array_stack.curr_elem, array_stack.stack + size - 1, 'q');
 
     rdtscll(time_end);
 
@@ -77,8 +84,8 @@ void efficiency_analysis(unsigned long long size)
 
     rdtscll(time_start);
 
-    for (unsigned long long i = 0; i < size; i++)
-        pop_array(&ptr_curr, array_stack);
+    for (unsigned long long i = 0; i < size - 1; i++)
+        pop_array(&array_stack.curr_elem, array_stack.stack);
 
     rdtscll(time_end);
 
@@ -86,15 +93,17 @@ void efficiency_analysis(unsigned long long size)
     printf("------------+---------------+----------------------------+-"
         "-------------------------\n");
 
+    free(array_stack.stack);
+
     struct node *last_elem = NULL;
-    unsigned long long list_memory = sizeof(last_elem) + 
+    unsigned long long list_memory = sizeof(struct node) + 
         sizeof(struct node) * size;
 
-    printf("   Список   |%1lu - %-11llu|", sizeof(last_elem), list_memory);
+    printf("   Список   |%2llu - %-10llu|", sizeof(struct node), list_memory);
 
     rdtscll(time_start);
 
-    for (unsigned long long i = 0; i < size; i++)
+    for (unsigned long long i = 0; i < size - 1; i++)
         last_elem = push_list(last_elem, 'q');
 
     rdtscll(time_end);
@@ -103,7 +112,7 @@ void efficiency_analysis(unsigned long long size)
 
     rdtscll(time_start);
 
-    for (unsigned long long i = 0; i < size; i++)
+    for (unsigned long long i = 0; i < size - 1; i++)
         last_elem = pop_list(last_elem, 0);
 
     rdtscll(time_end);
@@ -111,6 +120,4 @@ void efficiency_analysis(unsigned long long size)
     printf("%-25llu\n", (unsigned long long)(time_end - time_start));
     printf("------------+---------------+----------------------------+-"
         "-------------------------\n");
-
-    free(array_stack);
 }

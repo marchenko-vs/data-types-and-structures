@@ -9,6 +9,6 @@
 
 void print_introduction(void);
 void print_menu(void);
-void efficiency_analysis(unsigned long long size);
+void efficiency_analysis(unsigned long size);
 
 #endif // _INFO_H_
