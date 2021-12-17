@@ -11,3 +11,10 @@ out/main.o : src/main.c inc/graph.h
 
 out/graph.o : src/graph.c inc/graph.h
 	$(CC) $(CFLAGS) -I inc/ $< -c -o out/graph.o
+
+.PHONY : clean
+
+clean :
+	rm -rf out/
+	rm *.exe
+

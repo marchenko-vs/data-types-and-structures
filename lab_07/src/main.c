@@ -3,59 +3,25 @@
 
 #include "graph.h"
 
+#define rdtscll(val) __asm__ __volatile__("rdtsc" :"=A"(val))
+
 int main(void)
 {
     setbuf(stdout, NULL);
 
     int vertices;
 
-    printf("Enter number of vertices of the graph:\n");
-
-    if (scanf("%d", &vertices) != 1)
-    {
-        printf("Error: incorrect data type.\n");
+    if (g_get_vertices(&vertices) != EXIT_SUCCESS)
         return EXIT_FAILURE;
-    }
-
-    if (vertices < 1)
-    {
-        printf("Error: incorrect number of vertices.\n");
-        return EXIT_FAILURE;
-    }
 
     matrix_t adjacency_matrix = { NULL, vertices, vertices };
     m_allocate(&adjacency_matrix);
 
     int temp, begin_index, minindex, min, max_distance;
-    int tmp_i, tmp_j;
     int rc = EXIT_SUCCESS;
 
     m_constant_fill(&adjacency_matrix, 0);
-
-    printf("Enter data in the following format:\nvertex_1 vertex_2 distance\n"
-        "If you want to stop entering data, type : 0 0 0\n");
-
-    while (1)
-    {
-        if (scanf("%d%d%d", &tmp_i, &tmp_j, &temp) != 3)
-        {
-            printf("Error: incorrect data type.\n");
-            rc = EXIT_FAILURE;
-            break;
-        }
-
-        if (tmp_i == 0 && tmp_j == 0 && temp == 0)
-            break;
-
-        if (tmp_i < 1 || tmp_j > vertices || temp < 0)
-        {
-            printf("Error: input data is incorrect.\n");
-            rc = EXIT_FAILURE;
-            break;
-        }
-
-        adjacency_matrix.elements[tmp_i - 1][tmp_j - 1] = temp;
-    }
+    rc = m_scan(&adjacency_matrix, vertices);
 
     if (rc == EXIT_FAILURE)
     {
@@ -65,25 +31,7 @@ int main(void)
 
     int is_orientated;
 
-    printf("Is your graph orientated?\n0 - No\n1 - Yes\n");
-
-    if (scanf("%d", &is_orientated) != 1)
-    {
-        printf("Error: incorrect data type.\n");
-        rc = EXIT_FAILURE;
-    }
-
-    if (rc == EXIT_FAILURE)
-    {
-        m_free(&adjacency_matrix);
-        return rc;
-    }
-
-    if (is_orientated < 0 || is_orientated > 1)
-    {
-        printf("Error: you should choose between 0 and 1.\n");
-        rc = EXIT_FAILURE;
-    }
+    rc = g_is_orientated(&is_orientated);
 
     if (rc == EXIT_FAILURE)
     {
@@ -94,30 +42,14 @@ int main(void)
     if (is_orientated == 0)
         m_mirror(&adjacency_matrix);
 
-    // printf("[DBG] Adjacency matrix:\n");
+    draw_graph("out/graph.gv", &adjacency_matrix, is_orientated);
 
-    // for (size_t i = 0; i < vertices; i++)
-    // {
-    //     for (size_t j = 0; j < vertices; j++)
-    //         printf("%5d ", adjacency_matrix.elements[i][j]);
+    rc = g_get_vertex(&temp, vertices);
 
-    //     printf("\n");
-    // }
-
-    draw_graph("graph.gv", &adjacency_matrix, is_orientated);
-
-    printf("Enter the starting vertex:\n");
-
-    if (scanf("%d", &temp) != 1)
+    if (rc != EXIT_SUCCESS)
     {
-        printf("Error: incorrect data type.\n");
-        return EXIT_FAILURE;
-    }
-
-    if (temp < 1 || temp > vertices)
-    {
-        printf("Error: vertex %d does not exist.\n", temp);
-        return EXIT_FAILURE;
+        m_free(&adjacency_matrix);
+        return rc;
     }
 
     begin_index = temp - 1;
@@ -160,6 +92,14 @@ int main(void)
     }
 
     minimum_distance[begin_index] = 0;
+    unsigned long long time_start, time_end;
+    size_t memory;
+
+    memory = sizeof(matrix_t) + sizeof(minimum_distance) + 
+        sizeof(visited_peaks) + vertices * vertices * sizeof(int) +
+        vertices * sizeof(int *);
+
+    rdtscll(time_start);
 
     do
     {
@@ -168,7 +108,7 @@ int main(void)
 
         for (size_t i = 0; i < vertices; i++)
         {
-            if ((visited_peaks[i] == 1) && (minimum_distance[i]<min))
+            if ((visited_peaks[i] == 1) && (minimum_distance[i] < min))
             {
                 min = minimum_distance[i];
                 minindex = i;
@@ -193,6 +133,30 @@ int main(void)
         }
     }
     while (minindex < INFINITY);
+
+    rdtscll(time_end);
+    printf("Algorithm was working for %llu ticks.\n",
+        time_end - time_start);
+    printf("Algorithm used %llu bytes of memory.\n", memory);
+
+    size_t counter = 0;
+
+    for (size_t i = 1; i <= vertices; i++)
+        if (i - 1 != begin_index && minimum_distance[i - 1] <= max_distance)
+            counter++;
+
+    if (counter == 0)
+    {
+        printf("There are no reachable vertices.\n");
+
+        m_free(&adjacency_matrix);
+        free(minimum_distance);
+        free(visited_peaks);
+
+        system("bash draw_graph.sh");
+
+        return rc;
+    }
 
     printf("Next vertices are reachable from vertex %d shorter distance %d:\n",
         begin_index + 1, max_distance);
@@ -232,7 +196,7 @@ int main(void)
 
         printf("\nThe shortest way to vertex %llu:\n", i);
         char filename[15];
-        snprintf(filename, 15, "way_to_%llu.gv", i);
+        snprintf(filename, 15, "out/way_%llu.gv", i);
 
         FILE *f = fopen(filename, "w");
 
