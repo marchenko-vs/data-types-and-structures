@@ -1,5 +1,5 @@
 CC := gcc
-CFLAGS := -std=c99 -Wall -Werror
+CFLAGS := -std=c99 -Wvla
 OBJS := out/main.o out/graph.o
 
 app.exe : $(OBJS)
