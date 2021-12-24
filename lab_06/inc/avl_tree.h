@@ -11,7 +11,7 @@ typedef struct avl_node
     int height;
 } avl_node_t;
 
-avl_node_t *avl_insert(avl_node_t *node, int number);
+avl_node_t *avl_insert(avl_node_t *node, int number, int *comparisons);
 avl_node_t *avl_delete(avl_node_t *root, int number);
 void avl_pre_order(avl_node_t *root);
 void avl_export_to_dot(FILE *stream, 

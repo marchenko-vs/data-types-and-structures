@@ -63,15 +63,17 @@ int getBalance(avl_node_t *node)
     return height(node->left) - height(node->right);
 }
 
-avl_node_t *avl_insert(avl_node_t *node, int number)
+avl_node_t *avl_insert(avl_node_t *node, int number, int *comparisons)
 {
+    (*comparisons)++;
+
     if (node == NULL)
         return(avl_new_node(number));
  
     if (number < node->number)
-        node->left  = avl_insert(node->left, number);
+        node->left  = avl_insert(node->left, number, comparisons);
     else if (number > node->number)
-        node->right = avl_insert(node->right, number);
+        node->right = avl_insert(node->right, number, comparisons);
     else
         return node;
  

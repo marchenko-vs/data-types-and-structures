@@ -1,29 +1,31 @@
 CC := gcc
-CFLAGS := -std=c99 -Wall -Werror -Wvla
-OBJS := main.o bs_tree.o avl_tree.o hash_table.o universal.o array.o
+CFLAGS := -std=c99 -Wall -Werror -Wvla -I inc/
+INC_DIR := inc/
+OBJ_DIR := out/
+SRC_DIR := src/
+OBJS := $(OBJ_DIR)main.o $(OBJ_DIR)bs_tree.o $(OBJ_DIR)avl_tree.o $(OBJ_DIR)hash_table.o $(OBJ_DIR)io_functions.o
 
 app.exe : $(OBJS)
-	$(CC) $(OBJS) -o app.exe
+	$(CC) $^ -o app.exe
 
-main.o : main.c avl_tree.h bs_tree.h hash_table.h
-	$(CC) $(CFLAGS) main.c -c -o main.o
+$(OBJ_DIR)main.o : $(SRC_DIR)main.c $(INC_DIR)avl_tree.h $(INC_DIR)bs_tree.h $(OBJ_DIR)hash_table.o
+	mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) $< -c -o $(OBJ_DIR)main.o
 
-avl_tree.o : avl_tree.c avl_tree.h
-	$(CC) $(CFLAGS) avl_tree.c -c -o avl_tree.o
+$(OBJ_DIR)avl_tree.o : $(SRC_DIR)avl_tree.c $(INC_DIR)avl_tree.h
+	$(CC) $(CFLAGS) $< -c -o $(OBJ_DIR)avl_tree.o
 
-bs_tree.o : bs_tree.c bs_tree.h
-	$(CC) $(CFLAGS) bs_tree.c -c -o bs_tree.o
+$(OBJ_DIR)bs_tree.o : $(SRC_DIR)bs_tree.c $(INC_DIR)bs_tree.h
+	$(CC) $(CFLAGS) $< -c -o $(OBJ_DIR)bs_tree.o
 
-hash_table.o : hash_table.c hash_table.h
-	$(CC) $(CFLAGS) hash_table.c -c -o hash_table.o
+$(OBJ_DIR)hash_table.o : $(SRC_DIR)hash_table.c $(INC_DIR)hash_table.h
+	mkdir -p out/
+	$(CC) $(CFLAGS) $< -c -o $(OBJ_DIR)hash_table.o
 
-universal.o : universal.c universal.h
-	$(CC) $(CFLAGS) universal.c -c -o universal.o
-
-array.o : array.c array.h
-	$(CC) $(CFLAGS) array.c -c -o array.o
+$(OBJ_DIR)io_functions.o : $(SRC_DIR)io_functions.c $(INC_DIR)io_functions.h
+	$(CC) $(CFLAGS) $< -c -o $(OBJ_DIR)io_functions.o
 
 .PHONY : clean
 
 clean :
-	rm *.o *.png *.exe *.gv
+	rm -rf out/ *.png *.exe *.gv

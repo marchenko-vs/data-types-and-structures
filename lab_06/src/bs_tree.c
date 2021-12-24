@@ -3,20 +3,6 @@
 
 #include "bs_tree.h"
 
-// tree_node_t *bs_create_node(int number)
-// {
-//     tree_node_t *node = malloc(sizeof(tree_node_t));
-
-//     if (node)
-//     {
-//         node->number = number;
-//         node->left = NULL;
-//         node->right = NULL;
-//     }
-
-//     return node;
-// }
-
 tree_node_t *bs_new_node(int number)
 {
     tree_node_t *node = malloc(sizeof(tree_node_t));
@@ -27,8 +13,10 @@ tree_node_t *bs_new_node(int number)
     return node;
 }
 
-tree_node_t *bs_insert(tree_node_t *tree, int number)
+tree_node_t *bs_insert(tree_node_t *tree, int number, int *comparisons)
 {
+    (*comparisons)++;
+
     if (tree == NULL)
         return bs_new_node(number);
 
@@ -36,10 +24,10 @@ tree_node_t *bs_insert(tree_node_t *tree, int number)
         return tree;
 
     if (number < tree->number)
-        tree->left = bs_insert(tree->left, number);
+        tree->left = bs_insert(tree->left, number, comparisons);
 
     if (number > tree->number)
-        tree->right = bs_insert(tree->right, number);
+        tree->right = bs_insert(tree->right, number, comparisons);
 
     return tree;
 }

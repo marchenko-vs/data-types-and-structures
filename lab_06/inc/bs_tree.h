@@ -10,9 +10,8 @@ typedef struct tree_node
     tree_node_t *right;
 } tree_node_t;
 
-//tree_node_t *bs_create_node(int number);
 tree_node_t *bs_new_node(int number);
-tree_node_t *bs_insert(tree_node_t *tree, int number);
+tree_node_t *bs_insert(tree_node_t *tree, int number, int *comparisons);
 tree_node_t *bs_search(tree_node_t *tree, int number);
 void bs_for_dot(FILE *stream, tree_node_t *tree);
 void bs_pre_order(FILE *stream, tree_node_t *tree);
