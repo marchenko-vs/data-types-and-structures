@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "io_functions.h"
+#include "file_array.h"
 
 int get_array_size(FILE *f)
 {
@@ -42,7 +42,7 @@ int array_insert(array_t *array, int number, int *comparisons)
     if (!array->array)
         return -2;
 
-    *comparisons = 0;
+    *comparisons = 1;
 
     if (array->current_size == array->size)
     {
@@ -59,13 +59,13 @@ int array_insert(array_t *array, int number, int *comparisons)
 
     for (index = array->current_size - 1; index >= 0; index--)
     {
+        (*comparisons)++;
+
         if (number > array->array[index])
         {
             index++;
             break;
         }
-
-        (*comparisons)++;
     }
         
     if (index < 0)
@@ -75,6 +75,7 @@ int array_insert(array_t *array, int number, int *comparisons)
         array->array[i] = array->array[i - 1];
 
     array->array[index] = number;
+    array->current_size++;
 
     return EXIT_SUCCESS;
 }

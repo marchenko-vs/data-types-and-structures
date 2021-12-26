@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <time.h>
 
 #include "avl_tree.h"
 #include "bs_tree.h"
 #include "hash_table.h"
-#include "io_functions.h"
+#include "file_array.h"
+#include "info.h"
 
 #define ERR_ARGS_NUMBER -1
 #define ERR_FILE_OPEN -2
@@ -17,6 +17,7 @@
 int main(int argc, char **argv)
 {
     setbuf(stdout, NULL);
+    print_introduction();
 
     if (argc < 2)
     {
@@ -86,7 +87,7 @@ int main(int argc, char **argv)
     system("bash draw_graphs.sh");
     ht_print(&table);
 
-    int choice = 1, new_element = -1;
+    int choice = 1, new_element;
     int bs_comparisons = 0, avl_comparisons = 0, ht_comparisons = 0,
     file_comparisons = 0, max_comparisons = 0;
     char buffer[BUFFER_SIZE];
@@ -94,23 +95,28 @@ int main(int argc, char **argv)
 
     while (choice)
     {
-        printf("1. Add element into all structures.\n"
-            "2. Print all structures.\n"
-            "3. Efficiency analysis.\n"
-            "0. Exit.\n");
+        print_menu();
 
         if (scanf("%d", &choice) != 1)
         {
-            printf("Error:\n");
+            printf("Error: incorrect data type.\n");
             fgets(buffer, BUFFER_SIZE, stdin);
+
             continue;
         }
 
         if (choice < 0 || choice > 3)
+        {
+            printf("Error: choose number from 0 to 3.\n");
             continue;
+        }
 
         if (choice == 1)
         {
+            int rc = 0;
+
+            new_element = -1;
+
             while (new_element < 0)
             {
                 new_element = get_new_element();
@@ -121,21 +127,27 @@ int main(int argc, char **argv)
 
             if (scanf("%d", &max_comparisons) != 1)
             {
+                printf("Error: incorrect data type.\n");
                 fgets(buffer, BUFFER_SIZE, stdin);
+                
                 continue;
             }
 
             if (max_comparisons < 1)
+            {
+                printf("Error: you should have entered positive number"
+                " more than 2.\n");
+                
                 continue;
+            }
 
             bs_head = bs_insert(bs_head, new_element, &bs_comparisons);
             avl_head = avl_insert(avl_head, new_element, &avl_comparisons);
-            array_insert(&file_array, new_element, &file_comparisons);
 
             if (!flag)
-                ht_insert(&table, new_element, &ht_comparisons, hash_1);
+                rc = ht_insert(&table, new_element, &ht_comparisons, hash_1);
             else
-                ht_insert(&table, new_element, &ht_comparisons, hash_2);
+                rc = ht_insert(&table, new_element, &ht_comparisons, hash_2);
 
             if (ht_comparisons > max_comparisons)
             {
@@ -143,7 +155,14 @@ int main(int argc, char **argv)
                 flag = true;
             }
 
-            new_element = -1;
+            if (rc == -2)
+            {
+                printf("Error: this element already exists.\n");
+                continue;
+            }
+
+            array_insert(&file_array, new_element, &file_comparisons);
+            printf("Success: element has been added.\n");
         }
 
         if (choice == 2)
@@ -160,36 +179,24 @@ int main(int argc, char **argv)
 
             ht_print(&table);
 
-            print_array(&file_array);
-
             system("bash draw_graphs.sh");
         }
 
         if (choice == 3)
         {
-            srand(time(0));
-
-            for (size_t i = 0; i < 100; i++)
-            {
-                new_element = rand() % 100;
-
-                bs_head = bs_insert(bs_head, new_element, &bs_comparisons);
-                avl_head = avl_insert(avl_head, new_element, &avl_comparisons);
-                array_insert(&file_array, new_element, &file_comparisons);
-
-                if (!flag)
-                    ht_insert(&table, new_element, &ht_comparisons, hash_1);
-                else
-                    ht_insert(&table, new_element, &ht_comparisons, hash_2);
-
-                            printf("Efficiency: %d %d %d %d\n", bs_comparisons,
-                            avl_comparisons, ht_comparisons, file_comparisons);
-            }
+            efficiency_analysis(10);
+            efficiency_analysis(100);
+            efficiency_analysis(500);
+            efficiency_analysis(1000);
         }
     }
     
-    ht_free(&table);
     array_free(&file_array);
+    bs_free(bs_head);
+    avl_free(avl_head);
+    ht_free(&table);
+
+    printf("The program has been completed.\n");
 
     return EXIT_SUCCESS;
 }

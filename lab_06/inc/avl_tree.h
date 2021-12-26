@@ -16,5 +16,6 @@ avl_node_t *avl_delete(avl_node_t *root, int number);
 void avl_pre_order(avl_node_t *root);
 void avl_export_to_dot(FILE *stream, 
 const char *tree_name, avl_node_t *tree);
+void avl_free(avl_node_t *node);
 
 #endif // _AVL_TREE_H_

@@ -75,3 +75,13 @@ const char *tree_name, tree_node_t *tree)
     bs_pre_order(stream, tree);
     fprintf(stream, "}\n");
 }
+
+void bs_free(tree_node_t *node)
+{
+    if (node != NULL)
+    {
+        bs_free(node->right);
+        bs_free(node->left);
+        free(node);
+    }
+}

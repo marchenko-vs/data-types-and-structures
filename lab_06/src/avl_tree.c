@@ -215,3 +215,13 @@ const char *tree_name, avl_node_t *tree)
     avl_pre(stream, tree);
     fprintf(stream, "}\n");
 }
+
+void avl_free(avl_node_t *node)
+{
+    if (node != NULL)
+    {
+        avl_free(node->right);
+        avl_free(node->left);
+        free(node);
+    }
+}

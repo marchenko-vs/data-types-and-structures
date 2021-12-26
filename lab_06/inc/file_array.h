@@ -1,5 +1,5 @@
-#ifndef _IO_FUNCTIONS_
-#define _IO_FUNCTIONS_
+#ifndef _FILE_ARRAY_H_
+#define _FILE_ARRAY_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,4 +20,4 @@ void print_array(array_t *array);
 int cmp(const void *a, const void *b);
 int get_new_element(void);
 
-#endif // _IO_FUNCTIONS_
+#endif // _FILE_ARRAY_H_

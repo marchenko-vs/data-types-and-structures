@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #include "hash_table.h"
-#include "io_functions.h"
+#include "file_array.h"
 
 #define GOLDEN_RATIO 0.6180339
 
@@ -73,7 +73,11 @@ int *comparisons, int (*func)(int, int))
     }
 
     if (table->array[key] == data)
+    {
+        (*comparisons)++;
+        
         return -2;
+    }
 
     for (size_t i = 1; i < table->size; i++)
     {

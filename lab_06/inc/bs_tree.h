@@ -17,5 +17,6 @@ void bs_for_dot(FILE *stream, tree_node_t *tree);
 void bs_pre_order(FILE *stream, tree_node_t *tree);
 void bs_export_to_dot(FILE *stream, 
 const char *tree_name, tree_node_t *tree);
+void bs_free(tree_node_t *node);
 
 #endif // _BS_TREE_H_

@@ -3,7 +3,7 @@
 
 #include <stdlib.h>
 
-#include "io_functions.h"
+#include "file_array.h"
 
 typedef struct
 {
